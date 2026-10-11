@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hiromachi"
+version = "0.1.0"
+description = "地域清掃活動記録アプリ"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "Flask>=3.1,<4",
+    "peewee>=4.5,<5",
+    "Flask-Login>=0.6.3,<0.7",
+    "Flask-Session[cachelib]>=0.8,<1",
+    "Flask-WTF>=1.3,<2",
+    "python-dotenv>=1,<2",
+    "tzdata>=2025,<2027; platform_system == 'Windows'",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=9,<10",
+    "pytest-cov>=7,<8",
+]
+email = ["email-validator>=2,<3"]
+image = ["Pillow>=12,<13"]
+production = ["Waitress>=3,<4"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["hiromachi*"]
+
+[tool.setuptools.package-data]
+hiromachi = ["templates/**/*.html", "static/**/*.css"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

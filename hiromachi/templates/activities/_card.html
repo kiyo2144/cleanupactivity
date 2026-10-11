@@ -1,0 +1,14 @@
+<article class="activity-card">
+  <div class="card-heading">
+    <time datetime="{{ activity.activity_date.isoformat() }}">{{ activity.activity_date.strftime('%Y/%m/%d') }}</time>
+    <span>{{ activity.user.display_name }}さん</span>
+  </div>
+  <h2>{{ activity.location }}</h2>
+  <p>{{ activity.duration_minutes }}分・{{ activity.bag_count }}袋</p>
+  <p class="tags">
+    {% for link in activity.waste_type_links %}
+      <span>{{ link.waste_type.name }}</span>
+    {% endfor %}
+  </p>
+  <a href="{{ url_for('activities.detail', activity_id=activity.id) }}">詳しく見る</a>
+</article>

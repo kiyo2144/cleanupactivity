@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}活動の詳細 | ひろまち{% endblock %}
+{% block content %}
+  <article class="panel detail-list">
+    <h1>活動の詳細</h1>
+    <dl>
+      <dt>投稿者</dt><dd>{{ activity.user.display_name }}さん</dd>
+      <dt>活動日</dt><dd>{{ activity.activity_date.strftime('%Y/%m/%d') }}</dd>
+      <dt>活動場所</dt><dd>{{ activity.location }}</dd>
+      <dt>所要時間</dt><dd>{{ activity.duration_minutes }}分</dd>
+      <dt>ゴミの袋数</dt><dd>{{ activity.bag_count }}袋</dd>
+      <dt>ゴミの種類</dt>
+      <dd>{% for link in activity.waste_type_links %}{{ link.waste_type.name }}{% if not loop.last %}、{% endif %}{% endfor %}</dd>
+      <dt>コメント・感想</dt><dd>{{ activity.comment or 'コメントなし' }}</dd>
+    </dl>
+    <div class="actions">
+      <a href="{{ url_for('activities.index') }}">みんなの活動へ戻る</a>
+      {% if activity.user_id == current_user.id %}<a href="{{ url_for('users.me') }}">マイページへ戻る</a>{% endif %}
+    </div>
+  </article>
+{% endblock %}

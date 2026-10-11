@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}サーバーエラー | ひろまち{% endblock %}
+{% block content %}
+  <section class="panel error-page">
+    <h1>処理中にエラーが発生しました</h1>
+    <p>時間をおいて、もう一度操作してください。</p>
+    <a href="{{ url_for('activities.index') if current_user.is_authenticated else url_for('auth.login') }}">戻る</a>
+  </section>
+{% endblock %}

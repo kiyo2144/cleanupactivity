@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}ユーザー登録 | ひろまち{% endblock %}
+{% block content %}
+  <section class="panel form-panel">
+    <h1>ユーザー登録</h1>
+    <p>ユーザー名はログインに、表示名は活動の投稿者名に使います。</p>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="field">
+        {{ form.username.label }}
+        {{ form.username(autocomplete="username", maxlength="30") }}
+        {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.display_name.label }}
+        {{ form.display_name(autocomplete="name", maxlength="50") }}
+        {% for error in form.display_name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.password.label }}
+        {{ form.password(autocomplete="new-password", maxlength="128") }}
+        {% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.password_confirm.label }}
+        {{ form.password_confirm(autocomplete="new-password", maxlength="128") }}
+        {% for error in form.password_confirm.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      {{ form.submit(class_="button primary") }}
+    </form>
+    <p><a href="{{ url_for('auth.login') }}">ログインはこちら</a></p>
+  </section>
+{% endblock %}

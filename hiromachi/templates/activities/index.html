@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}みんなの活動 | ひろまち{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <h1>みんなの活動</h1>
+    <a class="button primary" href="{{ url_for('activities.create') }}">新しく記録する</a>
+  </div>
+
+  {% if activities %}
+    <div class="card-list">
+      {% for activity in activities %}
+        {% include "activities/_card.html" %}
+      {% endfor %}
+    </div>
+    <nav class="pagination" aria-label="ページ移動">
+      {% if page > 1 %}<a href="{{ url_for('activities.index', page=page - 1) }}">前へ</a>{% endif %}
+      <span>{{ page }} / {{ total_pages }}</span>
+      {% if page < total_pages %}<a href="{{ url_for('activities.index', page=page + 1) }}">次へ</a>{% endif %}
+    </nav>
+  {% else %}
+    <section class="empty-state">
+      <p>まだ活動記録がありません。</p>
+      <a class="button primary" href="{{ url_for('activities.create') }}">最初の活動を記録する</a>
+    </section>
+  {% endif %}
+{% endblock %}

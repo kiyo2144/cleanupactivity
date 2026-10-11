@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}マイページ | ひろまち{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <h1>マイページ</h1>
+      <p>{{ current_user.display_name }}さん</p>
+    </div>
+    <a class="button primary" href="{{ url_for('activities.create') }}">新しく記録する</a>
+  </div>
+  <section class="summary" aria-label="活動の集計">
+    <div><strong>{{ totals.activity_count }}</strong><span>活動回数</span></div>
+    <div><strong>{{ totals.total_minutes }}</strong><span>累計時間（分）</span></div>
+    <div><strong>{{ totals.total_bags }}</strong><span>累計袋数</span></div>
+  </section>
+
+  <h2>自分の活動</h2>
+  {% if activities %}
+    <div class="card-list">
+      {% for activity in activities %}
+        {% include "activities/_card.html" %}
+      {% endfor %}
+    </div>
+    <nav class="pagination" aria-label="ページ移動">
+      {% if page > 1 %}<a href="{{ url_for('users.me', page=page - 1) }}">前へ</a>{% endif %}
+      <span>{{ page }} / {{ total_pages }}</span>
+      {% if page < total_pages %}<a href="{{ url_for('users.me', page=page + 1) }}">次へ</a>{% endif %}
+    </nav>
+  {% else %}
+    <section class="empty-state">
+      <p>まだ活動記録がありません。</p>
+      <a class="button primary" href="{{ url_for('activities.create') }}">最初の活動を記録する</a>
+    </section>
+  {% endif %}
+{% endblock %}

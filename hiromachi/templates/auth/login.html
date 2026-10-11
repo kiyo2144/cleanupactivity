@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}ログイン | ひろまち{% endblock %}
+{% block content %}
+  <section class="panel form-panel">
+    <h1>ログイン</h1>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="field">
+        {{ form.username.label }}
+        {{ form.username(autocomplete="username", maxlength="30") }}
+        {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.password.label }}
+        {{ form.password(autocomplete="current-password", maxlength="128") }}
+        {% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      {{ form.submit(class_="button primary") }}
+    </form>
+    <p><a href="{{ url_for('auth.register') }}">ユーザー登録はこちら</a></p>
+  </section>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}清掃活動の記録 | ひろまち{% endblock %}
+{% block content %}
+  <section class="panel form-panel">
+    <h1>清掃活動の記録</h1>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="field">
+        {{ form.activity_date.label }}
+        {{ form.activity_date() }}
+        {% for error in form.activity_date.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.location.label }}
+        {{ form.location(maxlength="100", placeholder="例：フットパス北側の小道") }}
+        <p class="hint">自宅の番地など、詳しすぎる場所は入力しないでください。</p>
+        {% for error in form.location.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.duration_minutes.label }}
+        {{ form.duration_minutes(min="1", max="1440") }}
+        {% for error in form.duration_minutes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.bag_count.label }}
+        {{ form.bag_count(min="0", max="99") }}
+        {% for error in form.bag_count.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <fieldset class="field checkbox-list">
+        <legend>{{ form.waste_types.label.text }}</legend>
+        {% for option in form.waste_types %}
+          <label>{{ option() }} {{ option.label.text }}</label>
+        {% endfor %}
+        {% for error in form.waste_types.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </fieldset>
+      <div class="field">
+        {{ form.comment.label }}
+        {{ form.comment(maxlength="500", rows="5") }}
+        {% for error in form.comment.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="actions">
+        {{ form.submit(class_="button primary") }}
+        <a href="{{ url_for('activities.index') }}">キャンセル</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}
