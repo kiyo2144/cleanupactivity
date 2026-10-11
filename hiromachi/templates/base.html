@@ -7,25 +7,31 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
   <header class="site-header">
-    <a class="brand" href="{{ url_for('main.index') }}">ひろまち</a>
-    <nav aria-label="メインナビゲーション">
-      {% if current_user.is_authenticated %}
-        <a href="{{ url_for('activities.index') }}">みんなの活動</a>
-        <a href="{{ url_for('activities.create') }}">記録する</a>
-        <a href="{{ url_for('users.me') }}">マイページ</a>
-        <form class="inline-form" method="post" action="{{ url_for('auth.logout') }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button class="link-button" type="submit">ログアウト</button>
-        </form>
-      {% else %}
-        <a href="{{ url_for('auth.login') }}">ログイン</a>
-        <a href="{{ url_for('auth.register') }}">ユーザー登録</a>
-      {% endif %}
-    </nav>
+    <div class="site-header-inner">
+      <a class="brand" href="{{ url_for('main.index') }}">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>ひろまち</span>
+      </a>
+      <nav aria-label="メインナビゲーション">
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('activities.index') }}">みんなの活動</a>
+          <a href="{{ url_for('activities.create') }}">記録する</a>
+          <a href="{{ url_for('users.me') }}">マイページ</a>
+          <form class="inline-form" method="post" action="{{ url_for('auth.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="link-button" type="submit">ログアウト</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}">ログイン</a>
+          <a href="{{ url_for('auth.register') }}">ユーザー登録</a>
+        {% endif %}
+      </nav>
+    </div>
   </header>
 
-  <main class="container">
+  <main class="container" id="main-content">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <section aria-label="お知らせ">
