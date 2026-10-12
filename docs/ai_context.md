@@ -56,7 +56,7 @@ MVPの基本導線は次のとおりです。
 - `hiromachi/users/`：マイページ
 - `hiromachi/errors/`：400、404、413、500ハンドラー
 - `hiromachi/templates/`：Jinjaテンプレート
-- `hiromachi/static/`：CSSなどの静的ファイル
+- `hiromachi/static/`：共通CSSと活動写真プレビュー用JavaScript
 - `tests/`：pytestによる自動テスト
 
 Blueprintは`main`、`auth`、`activities`、`users`に分かれています。
@@ -140,7 +140,7 @@ pytest --cov=hiromachi --cov-report=term-missing
 - MVPのコードは実装済みです。
 - Flaskのアプリルート9件と静的ファイルルートが登録済みです。
 - 任意の活動写真1枚の登録と認証付き表示が実装済みです。
-- 2026年10月12日時点で自動テスト28件が成功しています。
+- 2026年10月13日時点で自動テスト29件が成功しています。
 - 完了済み機能を、明確な理由なく作り直さないでください。
 
 ## 11. 初版の対象外

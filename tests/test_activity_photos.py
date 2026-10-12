@@ -29,6 +29,26 @@ def image_upload(
     return stream, filename or f"activity.{extension}"
 
 
+def test_create_page_includes_photo_preview(client, user):
+    login(client)
+
+    response = client.get("/activities/new")
+
+    assert response.status_code == 200
+    assert 'id="photo-preview"' in response.text
+    assert 'data-max-bytes="5242880"' in response.text
+    assert 'aria-describedby="photo-help photo-privacy photo-preview-error"' in response.text
+    assert 'id="photo-preview-image"' in response.text
+    assert 'id="photo-preview-remove"' in response.text
+    assert "選択を取り消す" in response.text
+    assert "/static/js/photo-preview.js" in response.text
+
+    script = client.get("/static/js/photo-preview.js")
+    assert script.status_code == 200
+    assert "URL.createObjectURL" in script.text
+    assert "URL.revokeObjectURL" in script.text
+
+
 @pytest.mark.parametrize(
     ("image_format", "expected_mime"),
     [("JPEG", "image/jpeg"), ("PNG", "image/png"), ("WEBP", "image/webp")],

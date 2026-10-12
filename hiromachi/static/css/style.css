@@ -323,6 +323,42 @@ input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: var(--pr
 
 .hint { margin-block: 0.4rem; color: var(--muted); font-size: 0.88rem; }
 
+.photo-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 2px solid var(--strong-border);
+  border-radius: 1rem;
+  background: var(--surface-soft);
+}
+
+.photo-preview-heading {
+  margin: 0 0 0.75rem;
+  font-weight: 800;
+}
+
+.photo-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: 0.7rem;
+  background: var(--surface);
+}
+
+.photo-preview-remove {
+  margin-top: 0.85rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--strong-border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.photo-preview-remove:hover { background: #fff; }
+
 .required-note {
   margin-block: 0.75rem 1.25rem;
   color: var(--muted);
@@ -549,6 +585,7 @@ input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: var(--pr
   .detail-list dt { padding-bottom: 0.15rem; border-bottom: 0; }
   .detail-list dd { padding-top: 0; }
   .actions .button { width: 100%; }
+  .photo-preview { padding: 0.75rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

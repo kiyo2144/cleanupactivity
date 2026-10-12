@@ -40,9 +40,26 @@
       </div>
       <div class="field">
         {{ form.photo.label }}
-        {{ form.photo(accept="image/jpeg,image/png,image/webp") }}
-        <p class="hint">任意。JPEG、PNG、WebPのいずれか1枚、5MB以内。</p>
-        <p class="hint">人物や自宅など、公開したくない情報が写っていないか確認してください。</p>
+        {{ form.photo(
+          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp",
+          aria_describedby="photo-help photo-privacy photo-preview-error"
+        ) }}
+        <p class="hint" id="photo-help">任意。JPEG、PNG、WebPのいずれか1枚、5MB以内。</p>
+        <p class="hint" id="photo-privacy">人物や自宅など、公開したくない情報が写っていないか確認してください。</p>
+        <div
+          class="photo-preview"
+          id="photo-preview"
+          data-max-bytes="{{ config['PHOTO_MAX_BYTES'] }}"
+          hidden
+        >
+          <p class="photo-preview-heading">選択した写真のプレビュー</p>
+          <img id="photo-preview-image" alt="選択した活動写真のプレビュー">
+          <button class="photo-preview-remove" id="photo-preview-remove" type="button">
+            選択を取り消す
+          </button>
+        </div>
+        <p class="field-error" id="photo-preview-error" role="alert" aria-live="polite" hidden></p>
+        <noscript><p class="hint">プレビューにはJavaScriptが必要ですが、写真の投稿はそのまま行えます。</p></noscript>
         {% for error in form.photo.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
       </div>
       <div class="actions">
@@ -51,4 +68,5 @@
       </div>
     </form>
   </section>
+  <script src="{{ url_for('static', filename='js/photo-preview.js') }}" defer></script>
 {% endblock %}
