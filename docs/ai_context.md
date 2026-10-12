@@ -39,6 +39,7 @@ MVPの基本導線は次のとおりです。
 - python-dotenv：ローカル環境変数
 - pytest、pytest-cov：自動テスト
 - tzdata：Windowsでの`Asia/Tokyo`タイムゾーン対応
+- Pillow：活動写真の実内容検証、向き補正、縮小、メタデータ除去
 
 依存関係の定義は`pyproject.toml`、検証済みバージョンは`requirements-lock.txt`を参照します。
 
@@ -48,12 +49,12 @@ MVPの基本導線は次のとおりです。
 - `hiromachi/config.py`：環境変数からの設定読込
 - `hiromachi/extensions.py`：LoginManager、Session、CSRFProtect
 - `hiromachi/database.py`：Peewee接続の初期化と開閉
-- `hiromachi/models.py`：初版の4モデル
+- `hiromachi/models.py`：現在の5モデル
 - `hiromachi/commands.py`：`flask init-db`
 - `hiromachi/auth/`：ユーザー登録、ログイン、ログアウト
-- `hiromachi/activities/`：活動一覧、作成、詳細
+- `hiromachi/activities/`：活動一覧、作成、詳細、画像処理と配信
 - `hiromachi/users/`：マイページ
-- `hiromachi/errors/`：400、404、500ハンドラー
+- `hiromachi/errors/`：400、404、413、500ハンドラー
 - `hiromachi/templates/`：Jinjaテンプレート
 - `hiromachi/static/`：CSSなどの静的ファイル
 - `tests/`：pytestによる自動テスト
@@ -71,18 +72,20 @@ Blueprintは`main`、`auth`、`activities`、`users`に分かれています。
 | `activities.index` | GET | `/activities` | 全利用者の活動一覧 |
 | `activities.create` | GET, POST | `/activities/new` | 活動記録の作成 |
 | `activities.detail` | GET | `/activities/<int:activity_id>` | 活動詳細 |
+| `activities.photo` | GET | `/activities/<int:activity_id>/photo` | 認証付き活動写真配信 |
 | `users.me` | GET | `/me` | 自分の活動と集計 |
 
-Flaskのルート表には、上記8ルートに静的ファイル用の`static`を加えた9ルートがあります。
+Flaskのルート表には、上記9ルートに静的ファイル用の`static`を加えた10ルートがあります。
 
 ## 6. 初版のデータ
 
-初版で使用するテーブルは次の4つです。
+現在使用するテーブルは次の5つです。
 
 - `users`
 - `activities`
 - `waste_types`
 - `activity_waste_types`
+- `activity_photos`
 
 活動とゴミの種類は中間テーブルによる多対多です。活動作成と種類の関連付けは、同じトランザクションで保存します。
 
@@ -90,13 +93,13 @@ Flaskのルート表には、上記8ルートに静的ファイル用の`static`
 
 - SQLite：`instance/hiromachi.sqlite3`
 - サーバー側セッション：`instance/sessions/`
-- 将来の画像：追加する場合も`instance/`配下。初版では未実装
+- 活動写真：`instance/uploads/`
 - 秘密情報：`.env`
 - 設定例：`.env.example`
 
 `.env`、SQLiteファイル、セッションファイル、将来のアップロード実体はGitへ追加しません。
 
-主な環境変数は`SECRET_KEY`、`DATABASE_PATH`、`SESSION_DIR`、`SESSION_LIFETIME_DAYS`、`SESSION_COOKIE_SECURE`です。本番では推測できない`SECRET_KEY`とHTTPS用Cookie設定が必要です。
+主な環境変数は`SECRET_KEY`、`DATABASE_PATH`、`SESSION_DIR`、`UPLOAD_DIR`、`SESSION_LIFETIME_DAYS`、`SESSION_COOKIE_SECURE`です。本番では推測できない`SECRET_KEY`とHTTPS用Cookie設定が必要です。
 
 ## 8. 基本コマンド
 
@@ -130,18 +133,21 @@ pytest --cov=hiromachi --cov-report=term-missing
 
 既存コードと設計資料が食い違う場合は、勝手に片方へ合わせず差異を報告してください。仕様を変更するときは、該当する設計書、実装、テストを同じ作業内で更新します。
 
+`docs/lean_canvas.md`は初期検討時の記録として保持し、今後は更新しません。利用者テストの事実と進捗は`docs/tasks.md`、確定した要件は`docs/requirements.md`、画面・ルート・DBの変更は各設計書へ記録します。
+
 ## 10. 現在の状態
 
 - MVPのコードは実装済みです。
-- Flaskのアプリルート8件と静的ファイルルートが登録済みです。
-- 2026年10月12日時点で自動テスト16件が成功しています。
+- Flaskのアプリルート9件と静的ファイルルートが登録済みです。
+- 任意の活動写真1枚の登録と認証付き表示が実装済みです。
+- 2026年10月12日時点で自動テスト28件が成功しています。
 - 完了済み機能を、明確な理由なく作り直さないでください。
 
 ## 11. 初版の対象外
 
 次の機能は、要件と設計が更新されるまで実装しません。
 
-- 活動写真
+- 複数写真、動画、一覧・マイページのサムネイル
 - 活動記録の編集・削除
 - メールアドレス、メール認証、パスワード再設定
 - 地図、位置情報、清掃ルート

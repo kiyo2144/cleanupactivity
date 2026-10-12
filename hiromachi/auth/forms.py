@@ -13,11 +13,11 @@ USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_]+$")
 
 class RegistrationForm(FlaskForm):
     username = StringField(
-        "ユーザー名",
+        "ユーザーID",
         validators=[DataRequired(), Length(min=3, max=30)],
     )
     display_name = StringField(
-        "表示名",
+        "お名前",
         validators=[DataRequired(), Length(min=1, max=50)],
     )
     password = PasswordField(
@@ -35,11 +35,11 @@ class RegistrationForm(FlaskForm):
         if not USERNAME_PATTERN.fullmatch(username):
             raise ValidationError("半角英数字とアンダースコアだけを使用してください。")
         if User.select().where(User.username == username).exists():
-            raise ValidationError("このユーザー名は使用できません。")
+            raise ValidationError("このユーザーIDは使用できません。")
 
 
 class LoginForm(FlaskForm):
-    username = StringField("ユーザー名", validators=[DataRequired(), Length(max=30)])
+    username = StringField("ユーザーID", validators=[DataRequired(), Length(max=30)])
     password = PasswordField("パスワード", validators=[DataRequired(), Length(max=128)])
     submit = SubmitField("ログインする")
 

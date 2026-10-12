@@ -25,6 +25,7 @@ def create_app(config_override: Mapping[str, Any] | None = None) -> Flask:
 
     session_dir = Path(app.config["SESSION_DIR"])
     session_dir.mkdir(parents=True, exist_ok=True)
+    Path(app.config["UPLOAD_DIR"]).mkdir(parents=True, exist_ok=True)
     app.config["SESSION_CACHELIB"] = FileSystemCache(
         cache_dir=str(session_dir),
         threshold=500,

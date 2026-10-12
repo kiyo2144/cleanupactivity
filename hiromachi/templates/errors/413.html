@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}ファイルサイズエラー | ひろまち{% endblock %}
+{% block content %}
+  <section class="panel error-page">
+    <h1>写真のファイルサイズが大きすぎます</h1>
+    <p>5MB以内の写真を選び、もう一度記録してください。</p>
+    <a href="{{ url_for('activities.create') if current_user.is_authenticated else url_for('auth.login') }}">戻る</a>
+  </section>
+{% endblock %}

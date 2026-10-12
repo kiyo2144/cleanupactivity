@@ -3,26 +3,43 @@
 {% block content %}
   <section class="panel form-panel">
     <h1>ユーザー登録</h1>
-    <p>ユーザー名はログインに、表示名は活動の投稿者名に使います。</p>
+    <p>ユーザーIDはログインに、お名前は活動の投稿者名として表示されます。</p>
+    <p class="required-note"><span class="required-mark" aria-hidden="true">*</span> は必須項目です。</p>
     <form method="post" novalidate>
       {{ form.hidden_tag() }}
       <div class="field">
-        {{ form.username.label }}
+        <label for="{{ form.username.id }}">
+          {{ form.username.label.text }}
+          <span class="required-mark" aria-hidden="true">*</span>
+          <span class="visually-hidden">（必須）</span>
+        </label>
         {{ form.username(autocomplete="username", maxlength="30") }}
         {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
       </div>
       <div class="field">
-        {{ form.display_name.label }}
+        <label for="{{ form.display_name.id }}">
+          {{ form.display_name.label.text }}
+          <span class="required-mark" aria-hidden="true">*</span>
+          <span class="visually-hidden">（必須）</span>
+        </label>
         {{ form.display_name(autocomplete="name", maxlength="50") }}
         {% for error in form.display_name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
       </div>
       <div class="field">
-        {{ form.password.label }}
+        <label for="{{ form.password.id }}">
+          {{ form.password.label.text }}
+          <span class="required-mark" aria-hidden="true">*</span>
+          <span class="visually-hidden">（必須）</span>
+        </label>
         {{ form.password(autocomplete="new-password", maxlength="128") }}
         {% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
       </div>
       <div class="field">
-        {{ form.password_confirm.label }}
+        <label for="{{ form.password_confirm.id }}">
+          {{ form.password_confirm.label.text }}
+          <span class="required-mark" aria-hidden="true">*</span>
+          <span class="visually-hidden">（必須）</span>
+        </label>
         {{ form.password_confirm(autocomplete="new-password", maxlength="128") }}
         {% for error in form.password_confirm.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
       </div>

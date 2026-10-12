@@ -33,12 +33,18 @@ def load_config(instance_path: str) -> dict[str, object]:
 
     database_path = Path(os.getenv("DATABASE_PATH", instance_dir / "hiromachi.sqlite3"))
     session_dir = Path(os.getenv("SESSION_DIR", instance_dir / "sessions"))
+    upload_dir = Path(os.getenv("UPLOAD_DIR", instance_dir / "uploads"))
+    photo_max_bytes = 5 * 1024 * 1024
 
     return {
         "APP_ENV": environment,
         "SECRET_KEY": secret_key or "development-only-change-me",
         "DATABASE_PATH": str(database_path),
         "SESSION_DIR": str(session_dir),
+        "UPLOAD_DIR": str(upload_dir),
+        "PHOTO_MAX_BYTES": photo_max_bytes,
+        "PHOTO_MAX_DIMENSION": 2000,
+        "MAX_CONTENT_LENGTH": photo_max_bytes + (512 * 1024),
         "SESSION_TYPE": "cachelib",
         "SESSION_SERIALIZATION_FORMAT": "json",
         "SESSION_PERMANENT": True,

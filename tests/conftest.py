@@ -17,6 +17,7 @@ def app(tmp_path):
             "SECRET_KEY": "test-secret",
             "DATABASE_PATH": str(tmp_path / "test.sqlite3"),
             "SESSION_DIR": str(tmp_path / "sessions"),
+            "UPLOAD_DIR": str(tmp_path / "uploads"),
             "WTF_CSRF_ENABLED": False,
         }
     )

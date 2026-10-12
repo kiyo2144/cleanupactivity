@@ -33,7 +33,7 @@ def register():
                 password_hash=generate_password_hash(form.password.data),
             )
         except IntegrityError:
-            form.username.errors.append("このユーザー名は使用できません。")
+            form.username.errors.append("このユーザーIDは使用できません。")
         else:
             flash("ユーザー登録が完了しました。ログインしてください。", "success")
             return redirect(url_for("auth.login"), code=303)
@@ -54,7 +54,7 @@ def login():
             login_user(user)
             flash("ログインしました。", "success")
             return redirect(url_for("activities.index"), code=303)
-        form.password.errors.append("ユーザー名またはパスワードが正しくありません。")
+        form.password.errors.append("ユーザーIDまたはパスワードが正しくありません。")
 
     return render_template("auth/login.html", form=form)
 

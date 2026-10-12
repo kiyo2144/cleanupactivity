@@ -120,6 +120,29 @@ class ActivityWasteType(BaseModel):
         primary_key = CompositeKey("activity", "waste_type")
 
 
+class ActivityPhoto(BaseModel):
+    id = AutoField()
+    activity = ForeignKeyField(
+        Activity,
+        backref="photo_records",
+        on_delete="CASCADE",
+        unique=True,
+    )
+    storage_name = CharField(max_length=64, unique=True)
+    mime_type = CharField(
+        max_length=20,
+        constraints=[
+            Check("mime_type IN ('image/jpeg', 'image/png', 'image/webp')")
+        ],
+    )
+    width = IntegerField(constraints=[Check("width > 0")])
+    height = IntegerField(constraints=[Check("height > 0")])
+    created_at = DateTimeField(default=utc_now)
+
+    class Meta:
+        table_name = "activity_photos"
+
+
 INITIAL_WASTE_TYPES = (
     {"code": "burnable", "name": "燃えるごみ", "sort_order": 1},
     {
@@ -131,4 +154,4 @@ INITIAL_WASTE_TYPES = (
     {"code": "other", "name": "その他", "sort_order": 4},
 )
 
-INITIAL_MODELS = (User, WasteType, Activity, ActivityWasteType)
+INITIAL_MODELS = (User, WasteType, Activity, ActivityWasteType, ActivityPhoto)

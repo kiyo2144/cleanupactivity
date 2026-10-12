@@ -25,6 +25,7 @@ def test_activity_routes_require_login(client):
     assert client.get("/activities").status_code == 302
     assert client.get("/activities/new").status_code == 302
     assert client.get("/activities/1").status_code == 302
+    assert client.get("/activities/1/photo").status_code == 302
     assert client.get("/me").status_code == 302
 
 

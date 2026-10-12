@@ -8,6 +8,7 @@
 - Flask
 - Peewee
 - SQLite
+- Pillow（活動写真の検証・縮小）
 
 ## セットアップ
 
@@ -33,6 +34,8 @@ python -m pip install -r requirements-lock.txt
 flask --app hiromachi init-db
 flask --app hiromachi run --debug
 ```
+
+`init-db`は既存データを削除せず、活動写真用テーブルを含む不足テーブルとゴミ種類マスタを作成します。活動写真は既定で`instance/uploads/`へ保存されます。
 
 ブラウザーで`http://127.0.0.1:5000`を開きます。
 

@@ -3,6 +3,16 @@
 {% block content %}
   <article class="panel detail-list">
     <h1>活動の詳細</h1>
+    {% if photo %}
+      <figure class="activity-photo">
+        <img
+          src="{{ url_for('activities.photo', activity_id=activity.id) }}"
+          alt="{{ activity.location }}で行った清掃活動の写真"
+          width="{{ photo.width }}"
+          height="{{ photo.height }}"
+        >
+      </figure>
+    {% endif %}
     <dl>
       <dt>投稿者</dt><dd>{{ activity.user.display_name }}さん</dd>
       <dt>活動日</dt><dd>{{ activity.activity_date.strftime('%Y/%m/%d') }}</dd>

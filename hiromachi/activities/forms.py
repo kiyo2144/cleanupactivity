@@ -4,6 +4,7 @@ from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
 from wtforms import (
     DateField,
     IntegerField,
@@ -49,6 +50,7 @@ class ActivityForm(FlaskForm):
         validators=[InputRequired(message="1つ以上選択してください。")],
     )
     comment = TextAreaField("コメント・感想", validators=[Optional(), Length(max=500)])
+    photo = FileField("活動写真", validators=[Optional()])
     submit = SubmitField("記録する")
 
     def validate_activity_date(self, field: DateField) -> None:

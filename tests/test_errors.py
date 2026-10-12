@@ -21,3 +21,13 @@ def test_csrf_rejects_state_changing_request(app):
 
     assert response.status_code == 400
     assert "リクエストを処理できませんでした" in response.text
+
+
+def test_request_over_size_limit_uses_413_page(client, app):
+    response = client.post(
+        "/register",
+        data={"username": "x" * (app.config["MAX_CONTENT_LENGTH"] + 1)},
+    )
+
+    assert response.status_code == 413
+    assert "写真のファイルサイズが大きすぎます" in response.text
