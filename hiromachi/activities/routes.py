@@ -26,7 +26,7 @@ from ..models import (
     utc_now,
 )
 from . import blueprint
-from .forms import ActivityEditForm, ActivityForm
+from .forms import ActivityDeleteForm, ActivityEditForm, ActivityForm
 from .images import PhotoValidationError, process_photo, store_photo
 
 PAGE_SIZE = 10
@@ -98,6 +98,18 @@ def _remove_replaced_photo(path: Path | None, activity_id: int) -> None:
     except OSError:
         current_app.logger.exception(
             "Failed to remove replaced activity photo",
+            extra={"activity_id": activity_id},
+        )
+
+
+def _remove_deleted_photo(path: Path | None, activity_id: int) -> None:
+    if path is None:
+        return
+    try:
+        path.unlink(missing_ok=True)
+    except OSError:
+        current_app.logger.exception(
+            "Failed to remove deleted activity photo",
             extra={"activity_id": activity_id},
         )
 
@@ -278,6 +290,37 @@ def edit(activity_id: int):
         form=form,
         activity=activity,
         photo=existing_photo,
+    )
+
+
+@blueprint.route("/activities/<int:activity_id>/delete", methods=["GET", "POST"])
+@login_required
+def delete(activity_id: int):
+    activity = Activity.get_or_none(
+        (Activity.id == activity_id) & (Activity.user == current_user.id)
+    )
+    if activity is None:
+        abort(404)
+
+    photo = ActivityPhoto.get_or_none(ActivityPhoto.activity == activity.id)
+    photo_path = None
+    if photo is not None:
+        photo_path = Path(current_app.config["UPLOAD_DIR"]) / photo.storage_name
+
+    form = ActivityDeleteForm()
+    if form.validate_on_submit():
+        with database_proxy.atomic():
+            activity.delete_instance()
+
+        _remove_deleted_photo(photo_path, activity_id)
+        flash("活動を削除しました。", "success")
+        return redirect(url_for("users.me"), code=303)
+
+    return render_template(
+        "activities/delete.html",
+        form=form,
+        activity=activity,
+        has_photo=photo is not None,
     )
 
 

@@ -407,6 +407,10 @@ input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: var(--pr
 .primary { background: var(--primary); color: #fff; }
 .primary:hover { background: var(--primary-dark); }
 
+.danger { background: var(--danger); color: #fff; }
+.danger:hover { background: #84312c; }
+.warning-message { color: var(--danger); font-weight: 800; }
+
 .actions {
   display: flex;
   flex-wrap: wrap;

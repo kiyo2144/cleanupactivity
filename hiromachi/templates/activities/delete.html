@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}活動を削除 | ひろまち{% endblock %}
+{% block content %}
+  <section class="panel form-panel">
+    <h1>活動を削除</h1>
+    <p class="warning-message">この操作は元に戻せません。次の活動を削除してもよいか確認してください。</p>
+    <dl class="detail-list">
+      <dt>活動日</dt><dd>{{ activity.activity_date.strftime('%Y/%m/%d') }}</dd>
+      <dt>活動場所</dt><dd>{{ activity.location }}</dd>
+      <dt>活動写真</dt><dd>{{ 'あり' if has_photo else 'なし' }}</dd>
+    </dl>
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="actions">
+        {{ form.submit(class="button danger") }}
+        <a href="{{ url_for('activities.detail', activity_id=activity.id) }}">キャンセル</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

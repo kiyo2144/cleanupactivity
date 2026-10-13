@@ -69,3 +69,7 @@ class ActivityEditForm(ActivityForm):
             raise ValidationError(
                 "新しい写真の選択と現在の写真の削除は同時に指定できません。"
             )
+
+
+class ActivityDeleteForm(FlaskForm):
+    submit = SubmitField("削除する")

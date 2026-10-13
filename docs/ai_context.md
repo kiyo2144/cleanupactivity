@@ -73,10 +73,11 @@ Blueprintは`main`、`auth`、`activities`、`users`に分かれています。
 | `activities.create` | GET, POST | `/activities/new` | 活動記録の作成 |
 | `activities.detail` | GET | `/activities/<int:activity_id>` | 活動詳細 |
 | `activities.edit` | GET, POST | `/activities/<int:activity_id>/edit` | 本人限定の活動編集 |
+| `activities.delete` | GET, POST | `/activities/<int:activity_id>/delete` | 本人限定の活動削除 |
 | `activities.photo` | GET | `/activities/<int:activity_id>/photo` | 認証付き活動写真配信 |
 | `users.me` | GET | `/me` | 自分の活動と集計 |
 
-Flaskのルート表には、上記10ルートに静的ファイル用の`static`を加えた11ルートがあります。
+Flaskのルート表には、上記11ルートに静的ファイル用の`static`を加えた12ルートがあります。
 
 ## 6. 初版のデータ
 
@@ -139,10 +140,11 @@ pytest --cov=hiromachi --cov-report=term-missing
 ## 10. 現在の状態
 
 - MVPのコードは実装済みです。
-- Flaskのアプリルート10件と静的ファイルルートが登録済みです。
+- Flaskのアプリルート11件と静的ファイルルートが登録済みです。
 - 任意の活動写真1枚の登録と認証付き表示が実装済みです。
 - 投稿者本人による活動内容と写真の編集が実装済みです。
-- 2026年10月13日時点で自動テスト39件が成功しています。
+- 投稿者本人による確認画面付きの活動削除が実装済みです。
+- 2026年10月13日時点で自動テスト46件が成功しています。
 - 完了済み機能を、明確な理由なく作り直さないでください。
 
 ## 11. 初版の対象外
@@ -150,7 +152,6 @@ pytest --cov=hiromachi --cov-report=term-missing
 次の機能は、要件と設計が更新されるまで実装しません。
 
 - 複数写真、動画、一覧・マイページのサムネイル
-- 活動記録の削除
 - メールアドレス、メール認証、パスワード再設定
 - 地図、位置情報、清掃ルート
 - ランキング、バッジ、連続記録
