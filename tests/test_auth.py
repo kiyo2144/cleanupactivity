@@ -18,6 +18,9 @@ def test_auth_forms_use_user_facing_terms_and_required_marks(client):
     assert register_page.text.count('class="required-mark"') == 5
     assert "ログインID" in register_page.text
     assert "お名前" in register_page.text
+    assert register_page.text.index('id="display_name"') < register_page.text.index(
+        'id="username"'
+    )
     assert login_page.status_code == 200
     assert "ログインID" in login_page.text
 

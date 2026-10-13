@@ -8,15 +8,6 @@
     <form method="post" novalidate>
       {{ form.hidden_tag() }}
       <div class="field">
-        <label for="{{ form.username.id }}">
-          {{ form.username.label.text }}
-          <span class="required-mark" aria-hidden="true">*</span>
-          <span class="visually-hidden">（必須）</span>
-        </label>
-        {{ form.username(autocomplete="username", maxlength="30") }}
-        {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
-      <div class="field">
         <label for="{{ form.display_name.id }}">
           {{ form.display_name.label.text }}
           <span class="required-mark" aria-hidden="true">*</span>
@@ -24,6 +15,15 @@
         </label>
         {{ form.display_name(autocomplete="name", maxlength="50") }}
         {% for error in form.display_name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        <label for="{{ form.username.id }}">
+          {{ form.username.label.text }}
+          <span class="required-mark" aria-hidden="true">*</span>
+          <span class="visually-hidden">（必須）</span>
+        </label>
+        {{ form.username(autocomplete="username", maxlength="30") }}
+        {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
       </div>
       <div class="field">
         <label for="{{ form.password.id }}">
