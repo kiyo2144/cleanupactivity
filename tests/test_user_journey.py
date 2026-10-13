@@ -79,13 +79,30 @@ def test_complete_mvp_journey_with_csrf_enabled(app):
     assert "MVPの動作確認" in detail.text
     assert "燃えるごみ" in detail.text
 
+    activity_id = int(response.headers["Location"].rstrip("/").split("/")[-1])
+    edit_page = client.get(f"/activities/{activity_id}/edit")
+    response = client.post(
+        f"/activities/{activity_id}/edit",
+        data={
+            "csrf_token": _csrf_token(edit_page),
+            "activity_date": date.today().isoformat(),
+            "location": "フットパス南側",
+            "duration_minutes": "45",
+            "bag_count": "2",
+            "waste_types": [str(waste_type_id)],
+            "comment": "編集後の動作確認",
+        },
+    )
+    assert response.status_code == 303
+    assert response.headers["Location"].endswith(f"/activities/{activity_id}")
+
     activity_list = client.get("/activities")
     my_page = client.get("/me")
     assert activity_list.status_code == 200
-    assert "フットパス北側" in activity_list.text
+    assert "フットパス南側" in activity_list.text
     assert my_page.status_code == 200
     assert "MVP利用者" in my_page.text
-    assert "フットパス北側" in my_page.text
+    assert "フットパス南側" in my_page.text
 
     with database_proxy.connection_context():
         assert Activity.select().count() == 1

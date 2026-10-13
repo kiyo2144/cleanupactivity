@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}活動を編集 | ひろまち{% endblock %}
+{% block content %}
+  <section class="panel form-panel">
+    <h1>活動を編集</h1>
+    {% set cancel_url = url_for('activities.detail', activity_id=activity.id) %}
+    {% set allow_photo_removal = true %}
+    {% include "activities/_form.html" %}
+  </section>
+  <script src="{{ url_for('static', filename='js/photo-preview.js') }}" defer></script>
+{% endblock %}

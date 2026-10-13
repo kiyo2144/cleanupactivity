@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import (
+    BooleanField,
     DateField,
     IntegerField,
     SelectMultipleField,
@@ -56,3 +57,15 @@ class ActivityForm(FlaskForm):
     def validate_activity_date(self, field: DateField) -> None:
         if field.data and field.data > today_in_japan():
             raise ValidationError("未来の日付は指定できません。")
+
+
+class ActivityEditForm(ActivityForm):
+    photo = FileField("新しい活動写真", validators=[Optional()])
+    remove_photo = BooleanField("現在の写真を削除する")
+    submit = SubmitField("更新する")
+
+    def validate_photo(self, field: FileField) -> None:
+        if self.remove_photo.data and field.data and field.data.filename:
+            raise ValidationError(
+                "新しい写真の選択と現在の写真の削除は同時に指定できません。"
+            )

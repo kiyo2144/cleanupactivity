@@ -24,6 +24,7 @@
       <dt>コメント・感想</dt><dd>{{ activity.comment or 'コメントなし' }}</dd>
     </dl>
     <div class="actions">
+      {% if activity.user_id == current_user.id %}<a class="button secondary" href="{{ url_for('activities.edit', activity_id=activity.id) }}">編集する</a>{% endif %}
       <a href="{{ url_for('activities.index') }}">みんなの活動へ戻る</a>
       {% if activity.user_id == current_user.id %}<a href="{{ url_for('users.me') }}">マイページへ戻る</a>{% endif %}
     </div>

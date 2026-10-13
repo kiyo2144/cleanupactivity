@@ -3,70 +3,9 @@
 {% block content %}
   <section class="panel form-panel">
     <h1>清掃活動の記録</h1>
-    <form method="post" enctype="multipart/form-data" novalidate>
-      {{ form.hidden_tag() }}
-      <div class="field">
-        {{ form.activity_date.label }}
-        {{ form.activity_date() }}
-        {% for error in form.activity_date.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
-      <div class="field">
-        {{ form.location.label }}
-        {{ form.location(maxlength="100", placeholder="例：フットパス北側の小道") }}
-        <p class="hint">自宅の番地など、詳しすぎる場所は入力しないでください。</p>
-        {% for error in form.location.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
-      <div class="field">
-        {{ form.duration_minutes.label }}
-        {{ form.duration_minutes(min="1", max="1440") }}
-        {% for error in form.duration_minutes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
-      <div class="field">
-        {{ form.bag_count.label }}
-        {{ form.bag_count(min="0", max="99") }}
-        {% for error in form.bag_count.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
-      <fieldset class="field checkbox-list">
-        <legend>{{ form.waste_types.label.text }}</legend>
-        {% for option in form.waste_types %}
-          <label>{{ option() }} {{ option.label.text }}</label>
-        {% endfor %}
-        {% for error in form.waste_types.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </fieldset>
-      <div class="field">
-        {{ form.comment.label }}
-        {{ form.comment(maxlength="500", rows="5") }}
-        {% for error in form.comment.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
-      <div class="field">
-        {{ form.photo.label }}
-        {{ form.photo(
-          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp",
-          aria_describedby="photo-help photo-privacy photo-preview-error"
-        ) }}
-        <p class="hint" id="photo-help">任意。JPEG、PNG、WebPのいずれか1枚、5MB以内。</p>
-        <p class="hint" id="photo-privacy">人物や自宅など、公開したくない情報が写っていないか確認してください。</p>
-        <div
-          class="photo-preview"
-          id="photo-preview"
-          data-max-bytes="{{ config['PHOTO_MAX_BYTES'] }}"
-          hidden
-        >
-          <p class="photo-preview-heading">選択した写真のプレビュー</p>
-          <img id="photo-preview-image" alt="選択した活動写真のプレビュー">
-          <button class="photo-preview-remove" id="photo-preview-remove" type="button">
-            選択を取り消す
-          </button>
-        </div>
-        <p class="field-error" id="photo-preview-error" role="alert" aria-live="polite" hidden></p>
-        <noscript><p class="hint">プレビューにはJavaScriptが必要ですが、写真の投稿はそのまま行えます。</p></noscript>
-        {% for error in form.photo.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
-      <div class="actions">
-        {{ form.submit(class_="button primary") }}
-        <a href="{{ url_for('activities.index') }}">キャンセル</a>
-      </div>
-    </form>
+    {% set cancel_url = url_for('activities.index') %}
+    {% set allow_photo_removal = false %}
+    {% include "activities/_form.html" %}
   </section>
   <script src="{{ url_for('static', filename='js/photo-preview.js') }}" defer></script>
 {% endblock %}
