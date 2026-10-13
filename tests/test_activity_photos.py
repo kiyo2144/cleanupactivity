@@ -47,6 +47,21 @@ def heif_upload(
     return stream, filename
 
 
+def mpo_upload(*, filename: str = "activity.jpeg"):
+    stream = BytesIO()
+    primary = Image.new("RGB", (120, 80), "#4f7354")
+    secondary = Image.new("RGB", (40, 30), "#ffffff")
+    primary.save(
+        stream,
+        format="MPO",
+        save_all=True,
+        append_images=[secondary],
+        exif=Image.Exif(),
+    )
+    stream.seek(0)
+    return stream, filename
+
+
 def test_create_page_includes_photo_preview(client, user):
     login(client)
 
@@ -205,6 +220,46 @@ def test_multi_image_heif_uses_first_image(client, app, user):
     with database_proxy.connection_context():
         photo = ActivityPhoto.get()
         assert (photo.width, photo.height) == (120, 80)
+
+
+@pytest.mark.parametrize("extension", ["jpg", "jpeg"])
+def test_mpo_is_converted_to_jpeg_using_first_image(
+    client, app, user, extension
+):
+    login(client)
+
+    response = client.post(
+        "/activities/new",
+        data=activity_data(photo=mpo_upload(filename=f"activity.{extension}")),
+    )
+
+    assert response.status_code == 303
+    with database_proxy.connection_context():
+        photo = ActivityPhoto.get()
+        stored_path = Path(app.config["UPLOAD_DIR"]) / photo.storage_name
+        assert photo.mime_type == "image/jpeg"
+        assert photo.storage_name.endswith(".jpg")
+        assert (photo.width, photo.height) == (120, 80)
+    with Image.open(stored_path) as stored:
+        assert stored.format == "JPEG"
+        assert getattr(stored, "n_frames", 1) == 1
+        assert len(stored.getexif()) == 0
+
+
+def test_mpo_with_wrong_extension_is_rejected(client, app, user):
+    login(client)
+
+    response = client.post(
+        "/activities/new",
+        data=activity_data(photo=mpo_upload(filename="activity.png")),
+    )
+
+    assert response.status_code == 200
+    assert "拡張子と画像形式が一致していません" in response.text
+    with database_proxy.connection_context():
+        assert Activity.select().count() == 0
+        assert ActivityPhoto.select().count() == 0
+    assert list(Path(app.config["UPLOAD_DIR"]).iterdir()) == []
 
 
 @pytest.mark.parametrize(
