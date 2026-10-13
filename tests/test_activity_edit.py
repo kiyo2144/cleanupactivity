@@ -18,7 +18,7 @@ from hiromachi.models import (
 
 from .conftest import login
 from .test_activities import activity_data
-from .test_activity_photos import image_upload
+from .test_activity_photos import heif_upload, image_upload
 
 
 class _InputParser(HTMLParser):
@@ -86,6 +86,28 @@ def test_edit_page_prefills_activity_and_owner_link(client, user):
         if item.get("name") == "waste_types" and item.get("value") == burnable_id
     )
     assert "checked" in selected
+
+
+def test_edit_can_replace_photo_with_heif(client, app, user):
+    login(client)
+    activity_id = _create_activity(client, photo=image_upload())
+    with database_proxy.connection_context():
+        original_name = ActivityPhoto.get().storage_name
+
+    response = client.post(
+        f"/activities/{activity_id}/edit",
+        data=activity_data(photo=heif_upload()),
+    )
+
+    assert response.status_code == 303
+    with database_proxy.connection_context():
+        photo = ActivityPhoto.get()
+        assert photo.mime_type == "image/jpeg"
+        assert photo.storage_name.endswith(".jpg")
+        assert photo.storage_name != original_name
+    upload_dir = Path(app.config["UPLOAD_DIR"])
+    assert not (upload_dir / original_name).exists()
+    assert (upload_dir / photo.storage_name).is_file()
 
 
 def test_edit_updates_activity_waste_types_and_timestamp(client, user, monkeypatch):

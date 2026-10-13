@@ -34,7 +34,7 @@ def load_config(instance_path: str) -> dict[str, object]:
     database_path = Path(os.getenv("DATABASE_PATH", instance_dir / "hiromachi.sqlite3"))
     session_dir = Path(os.getenv("SESSION_DIR", instance_dir / "sessions"))
     upload_dir = Path(os.getenv("UPLOAD_DIR", instance_dir / "uploads"))
-    photo_max_bytes = 5 * 1024 * 1024
+    photo_max_bytes = 10 * 1024 * 1024
 
     return {
         "APP_ENV": environment,

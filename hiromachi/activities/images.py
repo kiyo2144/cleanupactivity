@@ -10,7 +10,10 @@ from pathlib import Path
 from uuid import uuid4
 
 from PIL import Image, ImageOps, UnidentifiedImageError
+from pillow_heif import register_heif_opener
 from werkzeug.datastructures import FileStorage
+
+register_heif_opener()
 
 
 class PhotoValidationError(ValueError):
@@ -42,6 +45,9 @@ _FORMAT_SETTINGS = {
         "extension": ".webp",
         "mime_type": "image/webp",
     },
+    "HEIF": {
+        "extensions": {".heic", ".heif"},
+    },
 }
 
 
@@ -55,7 +61,10 @@ def process_photo(
 
     raw = upload.stream.read(max_bytes + 1)
     if len(raw) > max_bytes:
-        raise PhotoValidationError("写真のファイルサイズは5MB以内にしてください。")
+        max_megabytes = max_bytes // (1024 * 1024)
+        raise PhotoValidationError(
+            f"写真のファイルサイズは{max_megabytes}MB以内にしてください。"
+        )
     if not raw:
         raise PhotoValidationError("写真ファイルを選択してください。")
 
@@ -66,9 +75,9 @@ def process_photo(
                 image_format = source.format
                 if image_format not in _FORMAT_SETTINGS:
                     raise PhotoValidationError(
-                        "写真はJPEG、PNG、WebPのいずれかを選択してください。"
+                        "写真はJPEG、PNG、WebP、HEIC、HEIFのいずれかを選択してください。"
                     )
-                if getattr(source, "n_frames", 1) != 1:
+                if image_format != "HEIF" and getattr(source, "n_frames", 1) != 1:
                     raise PhotoValidationError("アニメーション画像は登録できません。")
 
                 suffix = Path(upload.filename or "").suffix.lower()
@@ -78,6 +87,8 @@ def process_photo(
                         "ファイルの拡張子と画像形式が一致していません。"
                     )
 
+                if image_format == "HEIF":
+                    source.seek(0)
                 source.load()
                 oriented = ImageOps.exif_transpose(source)
                 oriented.thumbnail(
@@ -100,11 +111,18 @@ def process_photo(
         ) from error
 
     output = BytesIO()
-    if image_format == "JPEG":
+    output_format = image_format
+    if image_format == "HEIF":
+        has_transparency = image.mode in {"LA", "PA", "RGBA"} or (
+            image.mode == "P" and "transparency" in image.info
+        )
+        output_format = "PNG" if has_transparency else "JPEG"
+        settings = _FORMAT_SETTINGS[output_format]
+    if output_format == "JPEG":
         if image.mode not in {"RGB", "L"}:
             image = image.convert("RGB")
         image.save(output, format="JPEG", quality=85, optimize=True)
-    elif image_format == "PNG":
+    elif output_format == "PNG":
         image.save(output, format="PNG", optimize=True)
     else:
         image.save(output, format="WEBP", quality=85, method=6)

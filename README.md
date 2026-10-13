@@ -8,7 +8,7 @@
 - Flask
 - Peewee
 - SQLite
-- Pillow（活動写真の検証・縮小）
+- Pillow・pillow-heif（活動写真の検証・縮小・HEIC/HEIF変換）
 
 ## セットアップ
 
