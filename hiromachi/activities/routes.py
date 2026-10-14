@@ -1,5 +1,6 @@
 """Activity list, creation, and detail routes."""
 
+import json
 from math import ceil
 from pathlib import Path
 
@@ -20,6 +21,7 @@ from ..database import database_proxy
 from ..models import (
     Activity,
     ActivityPhoto,
+    ActivityRoute,
     ActivityWasteType,
     User,
     WasteType,
@@ -88,6 +90,34 @@ def _activity_values(form):
         "bag_count": form.bag_count.data,
         "comment": comment or None,
     }
+
+
+def _route_points(points_json: str | None):
+    if not points_json:
+        return None
+    return json.loads(points_json)
+
+
+def _save_activity_route(activity: Activity, points_json: str | None) -> None:
+    existing_route = ActivityRoute.get_or_none(ActivityRoute.activity == activity.id)
+    if not points_json:
+        if existing_route is not None:
+            existing_route.delete_instance()
+        return
+
+    point_count = len(json.loads(points_json))
+    if existing_route is None:
+        ActivityRoute.create(
+            activity=activity,
+            points_json=points_json,
+            point_count=point_count,
+        )
+        return
+
+    existing_route.points_json = points_json
+    existing_route.point_count = point_count
+    existing_route.updated_at = utc_now()
+    existing_route.save()
 
 
 def _remove_replaced_photo(path: Path | None, activity_id: int) -> None:
@@ -170,6 +200,7 @@ def create():
                             for waste_type in selected
                         ]
                     ).execute()
+                    _save_activity_route(activity, form.route_points.data)
                     if processed_photo is not None:
                         storage_name, stored_path = store_photo(
                             processed_photo,
@@ -207,7 +238,15 @@ def detail(activity_id: int):
         abort(404)
     activity = activities[0]
     photo = ActivityPhoto.get_or_none(ActivityPhoto.activity == activity.id)
-    return render_template("activities/detail.html", activity=activity, photo=photo)
+    activity_route = ActivityRoute.get_or_none(ActivityRoute.activity == activity.id)
+    return render_template(
+        "activities/detail.html",
+        activity=activity,
+        photo=photo,
+        route_points=_route_points(
+            activity_route.points_json if activity_route is not None else None
+        ),
+    )
 
 
 @blueprint.route("/activities/<int:activity_id>/edit", methods=["GET", "POST"])
@@ -222,6 +261,7 @@ def edit(activity_id: int):
     existing_photo = ActivityPhoto.get_or_none(
         ActivityPhoto.activity == activity.id
     )
+    existing_route = ActivityRoute.get_or_none(ActivityRoute.activity == activity.id)
     form = ActivityEditForm(obj=activity)
     waste_types = _waste_types_for_form(form)
     if request.method == "GET":
@@ -231,6 +271,9 @@ def edit(activity_id: int):
                 ActivityWasteType.activity == activity.id
             )
         ]
+        form.route_points.data = (
+            existing_route.points_json if existing_route is not None else None
+        )
 
     if form.validate_on_submit():
         selected = _selected_waste_types(form, waste_types)
@@ -258,6 +301,7 @@ def edit(activity_id: int):
                             for waste_type in selected
                         ]
                     ).execute()
+                    _save_activity_route(activity, form.route_points.data)
 
                     if processed_photo is not None:
                         storage_name, new_stored_path = store_photo(

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}活動の詳細 | ひろまち{% endblock %}
+{% block head %}{% if route_points %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}">{% endif %}{% endblock %}
 {% block content %}
   <article class="panel detail-list">
     <h1>活動の詳細</h1>
@@ -12,6 +13,19 @@
           height="{{ photo.height }}"
         >
       </figure>
+    {% endif %}
+    {% if route_points %}
+      <section class="activity-route" aria-labelledby="activity-route-heading">
+        <h2 id="activity-route-heading">清掃ルート</h2>
+        <p class="hint">プライバシー保護のため、始点と終点は約100m単位に丸めて表示しています。</p>
+        <div
+          class="route-map"
+          id="activity-route-map"
+          data-route-mode="view"
+          data-route-points='{{ route_points|tojson }}'
+          aria-label="登録された清掃ルートの地図"
+        ></div>
+      </section>
     {% endif %}
     <dl>
       <dt>投稿者</dt><dd>{{ activity.user.display_name }}さん</dd>
@@ -30,4 +44,8 @@
       {% if activity.user_id == current_user.id %}<a href="{{ url_for('users.me') }}">マイページへ戻る</a>{% endif %}
     </div>
   </article>
+  {% if route_points %}
+    <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/activity-route-map.js') }}" defer></script>
+  {% endif %}
 {% endblock %}

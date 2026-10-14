@@ -35,7 +35,12 @@ include-package-data = true
 include = ["hiromachi*"]
 
 [tool.setuptools.package-data]
-hiromachi = ["templates/**/*.html", "static/**/*.css", "static/**/*.js"]
+hiromachi = [
+    "templates/**/*.html",
+    "static/**/*.css",
+    "static/**/*.js",
+    "static/**/*.txt",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

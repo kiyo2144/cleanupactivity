@@ -143,6 +143,25 @@ class ActivityPhoto(BaseModel):
         table_name = "activity_photos"
 
 
+class ActivityRoute(BaseModel):
+    id = AutoField()
+    activity = ForeignKeyField(
+        Activity,
+        backref="route_records",
+        on_delete="CASCADE",
+        unique=True,
+    )
+    points_json = TextField(
+        constraints=[Check("length(points_json) BETWEEN 5 AND 8192")]
+    )
+    point_count = IntegerField(constraints=[Check("point_count BETWEEN 2 AND 100")])
+    created_at = DateTimeField(default=utc_now)
+    updated_at = DateTimeField(default=utc_now)
+
+    class Meta:
+        table_name = "activity_routes"
+
+
 INITIAL_WASTE_TYPES = (
     {"code": "burnable", "name": "燃えるごみ", "sort_order": 1},
     {
@@ -154,4 +173,11 @@ INITIAL_WASTE_TYPES = (
     {"code": "other", "name": "その他", "sort_order": 4},
 )
 
-INITIAL_MODELS = (User, WasteType, Activity, ActivityWasteType, ActivityPhoto)
+INITIAL_MODELS = (
+    User,
+    WasteType,
+    Activity,
+    ActivityWasteType,
+    ActivityPhoto,
+    ActivityRoute,
+)

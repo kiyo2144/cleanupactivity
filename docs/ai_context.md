@@ -41,6 +41,7 @@ MVPの基本導線は次のとおりです。
 - tzdata：Windowsでの`Asia/Tokyo`タイムゾーン対応
 - Pillow：活動写真の実内容検証、向き補正、縮小、メタデータ除去
 - pillow-heif：HEIC・HEIFの読み込みとJPEG・PNGへの変換
+- Leaflet 1.9.4（アプリ内配置）：清掃ルートの入力・地図表示
 
 依存関係の定義は`pyproject.toml`、検証済みバージョンは`requirements-lock.txt`を参照します。
 
@@ -50,14 +51,14 @@ MVPの基本導線は次のとおりです。
 - `hiromachi/config.py`：環境変数からの設定読込
 - `hiromachi/extensions.py`：LoginManager、Session、CSRFProtect
 - `hiromachi/database.py`：Peewee接続の初期化と開閉
-- `hiromachi/models.py`：現在の5モデル
+- `hiromachi/models.py`：現在の6モデル
 - `hiromachi/commands.py`：`flask init-db`
 - `hiromachi/auth/`：ユーザー登録、ログイン、ログアウト
 - `hiromachi/activities/`：活動一覧、作成、詳細、画像処理と配信
 - `hiromachi/users/`：マイページ
 - `hiromachi/errors/`：400、404、413、500ハンドラー
 - `hiromachi/templates/`：Jinjaテンプレート
-- `hiromachi/static/`：共通CSSと活動写真プレビュー用JavaScript
+- `hiromachi/static/`：共通CSS、写真プレビュー、清掃ルート地図、Leaflet配布ファイル
 - `tests/`：pytestによる自動テスト
 
 Blueprintは`main`、`auth`、`activities`、`users`に分かれています。
@@ -82,15 +83,16 @@ Flaskのルート表には、上記11ルートに静的ファイル用の`static
 
 ## 6. 初版のデータ
 
-現在使用するテーブルは次の5つです。
+現在使用するテーブルは次の6つです。
 
 - `users`
 - `activities`
 - `waste_types`
 - `activity_waste_types`
 - `activity_photos`
+- `activity_routes`
 
-活動とゴミの種類は中間テーブルによる多対多です。活動作成・編集と種類の関連付けは、同じトランザクションで保存します。
+活動とゴミの種類は中間テーブルによる多対多です。活動作成・編集と種類、写真、任意の清掃ルートは同じトランザクションで保存します。
 
 ## 7. 保存先と環境変数
 
@@ -156,9 +158,12 @@ pytest --cov=hiromachi --cov-report=term-missing
 - JPEG拡張子のMPOを通常JPEGへ変換する互換処理が実装済みです。
 - 投稿者本人による活動内容と写真の編集が実装済みです。
 - 投稿者本人による確認画面付きの活動削除が実装済みです。
+- 地図上で手動入力する任意の清掃ルートと、ログイン利用者向けの詳細表示がローカル実装済みです。PythonAnywhereへの反映は未実施です。
+- 空のルートでは、ボタン操作による1回の現在地取得と、ドラッグによる始点修正がローカル実装済みです。
+- 清掃ルートの始点と終点はサーバー側で小数点以下3桁へ丸めて保存します。
 - PythonAnywhere Beginnerへデプロイ済みです。
 - iPhone実機からの写真投稿とサーバー側の画像変換を確認済みです。
-- 2026年10月14日時点で自動テスト59件が成功しています。
+- 2026年10月14日時点で自動テスト71件が成功しています。
 - 完了済み機能を、明確な理由なく作り直さないでください。
 
 ## 11. 初版の対象外
@@ -167,7 +172,7 @@ pytest --cov=hiromachi --cov-report=term-missing
 
 - 複数写真、動画、一覧・マイページのサムネイル
 - メールアドレス、メール認証、パスワード再設定
-- 地図、位置情報、清掃ルート
+- GPSによる連続・バックグラウンド記録、住所検索、複数ルート
 - ランキング、バッジ、連続記録
 - コメント、リアクション、フォロー
 - 清掃イベント、通知

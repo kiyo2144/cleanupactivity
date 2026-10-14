@@ -1,5 +1,5 @@
 <form method="post" enctype="multipart/form-data" novalidate>
-  {{ form.hidden_tag() }}
+  {{ form.hidden_tag("csrf_token") }}
   <div class="field">
     {{ form.activity_date.label }}
     {{ form.activity_date() }}
@@ -10,6 +10,35 @@
     {{ form.location(maxlength="100", placeholder="例：フットパス北側の小道") }}
     <p class="hint">自宅の番地など、詳しすぎる場所は入力しないでください。</p>
     {% for error in form.location.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  </div>
+  <div class="field route-field">
+    {{ form.route_points.label }}
+    {{ form.route_points(id="route-points") }}
+    <p class="hint" id="route-help">任意。地図を順番にタップして、清掃した道を線で記録します。</p>
+    <p class="hint">自宅などを推測されにくくするため、保存時に始点と終点を約100m単位に丸めます。</p>
+    <button
+      class="button secondary route-location-button"
+      id="route-current-location"
+      type="button"
+      aria-controls="activity-route-map"
+      aria-describedby="route-location-status route-help"
+      {% if form.route_points.data %}hidden{% endif %}
+    >現在地から始める</button>
+    <p class="hint" id="route-location-status" role="status" aria-live="polite" hidden></p>
+    <div
+      class="route-map"
+      id="activity-route-map"
+      data-route-mode="edit"
+      aria-label="清掃ルート入力地図"
+      aria-describedby="route-help route-status route-location-status"
+    ></div>
+    <div class="route-actions">
+      <button class="button secondary" id="route-undo" type="button">1地点戻す</button>
+      <button class="button secondary" id="route-clear" type="button">ルートをクリア</button>
+    </div>
+    <p class="hint" id="route-status" role="status" aria-live="polite">地図をタップして2地点以上を指定してください。</p>
+    <noscript><p class="hint">ルート入力にはJavaScriptが必要です。ルートなしでも活動を記録できます。</p></noscript>
+    {% for error in form.route_points.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
   </div>
   <div class="field">
     {{ form.duration_minutes.label }}

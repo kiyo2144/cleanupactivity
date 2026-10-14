@@ -13,6 +13,7 @@ def test_init_db_is_repeatable(runner):
         assert set(database_proxy.get_tables()) == {
             "activities",
             "activity_photos",
+            "activity_routes",
             "activity_waste_types",
             "users",
             "waste_types",
