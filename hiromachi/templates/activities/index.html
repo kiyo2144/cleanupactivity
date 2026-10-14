@@ -6,6 +6,13 @@
     <a class="button primary" href="{{ url_for('activities.create') }}">新しく記録する</a>
   </div>
 
+  <h2>まちのみんなの成果</h2>
+  <section class="summary" aria-label="地域全体の活動集計">
+    <div data-metric="activity-count"><strong>{{ totals.activity_count }}</strong><span>活動回数</span></div>
+    <div data-metric="total-minutes"><strong>{{ totals.total_minutes }}</strong><span>累計時間（分）</span></div>
+    <div data-metric="total-bags"><strong>{{ totals.total_bags }}</strong><span>累計袋数</span></div>
+  </section>
+
   {% if activities %}
     <div class="card-list">
       {% for activity in activities %}

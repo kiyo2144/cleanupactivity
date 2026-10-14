@@ -14,7 +14,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
-from peewee import prefetch
+from peewee import fn, prefetch
 
 from ..database import database_proxy
 from ..models import (
@@ -117,6 +117,17 @@ def _remove_deleted_photo(path: Path | None, activity_id: int) -> None:
 @blueprint.get("/activities")
 @login_required
 def index():
+    totals = (
+        Activity.select(
+            fn.COUNT(Activity.id).alias("activity_count"),
+            fn.COALESCE(fn.SUM(Activity.duration_minutes), 0).alias(
+                "total_minutes"
+            ),
+            fn.COALESCE(fn.SUM(Activity.bag_count), 0).alias("total_bags"),
+        )
+        .dicts()
+        .get()
+    )
     query = (
         Activity.select(Activity, User)
         .join(User)
@@ -125,6 +136,7 @@ def index():
     activities, page, total_pages = _activity_page(query)
     return render_template(
         "activities/index.html",
+        totals=totals,
         activities=activities,
         page=page,
         total_pages=total_pages,

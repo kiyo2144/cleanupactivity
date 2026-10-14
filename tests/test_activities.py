@@ -1,7 +1,9 @@
 from datetime import date, timedelta
 
+from werkzeug.security import generate_password_hash
+
 from hiromachi.database import database_proxy
-from hiromachi.models import Activity, ActivityWasteType, WasteType
+from hiromachi.models import Activity, ActivityWasteType, User, WasteType
 
 from .conftest import login
 
@@ -80,6 +82,70 @@ def test_activity_list_is_paginated(client, user):
     assert second_page.status_code == 200
     assert second_page.text.count("activity-card") == 1
     assert client.get("/activities?page=3").status_code == 404
+
+
+def test_activity_list_shows_zero_totals(client, user):
+    login(client)
+
+    response = client.get("/activities")
+
+    assert response.status_code == 200
+    assert 'data-metric="activity-count"><strong>0</strong>' in response.text
+    assert 'data-metric="total-minutes"><strong>0</strong>' in response.text
+    assert 'data-metric="total-bags"><strong>0</strong>' in response.text
+
+
+def test_activity_list_totals_include_all_users_and_pages(client, user):
+    with database_proxy.atomic():
+        other_user = User.create(
+            username="other_user",
+            display_name="別の利用者",
+            password_hash=generate_password_hash("password123"),
+        )
+        for number in range(11):
+            Activity.create(
+                user=user if number < 6 else other_user,
+                activity_date=date.today(),
+                location=f"場所{number}",
+                duration_minutes=number + 1,
+                bag_count=number % 3,
+            )
+    login(client)
+
+    first_page = client.get("/activities")
+    second_page = client.get("/activities?page=2")
+
+    for response in (first_page, second_page):
+        assert 'data-metric="activity-count"><strong>11</strong>' in response.text
+        assert 'data-metric="total-minutes"><strong>66</strong>' in response.text
+        assert 'data-metric="total-bags"><strong>10</strong>' in response.text
+
+
+def test_activity_totals_follow_create_edit_and_delete(client, user):
+    login(client)
+    created = client.post("/activities/new", data=activity_data())
+    activity_id = int(created.headers["Location"].rstrip("/").split("/")[-1])
+
+    after_create = client.get("/activities")
+    assert 'data-metric="activity-count"><strong>1</strong>' in after_create.text
+    assert 'data-metric="total-minutes"><strong>30</strong>' in after_create.text
+    assert 'data-metric="total-bags"><strong>1</strong>' in after_create.text
+
+    edited = client.post(
+        f"/activities/{activity_id}/edit",
+        data=activity_data(duration_minutes="45", bag_count="3"),
+    )
+    assert edited.status_code == 303
+    after_edit = client.get("/activities")
+    assert 'data-metric="total-minutes"><strong>45</strong>' in after_edit.text
+    assert 'data-metric="total-bags"><strong>3</strong>' in after_edit.text
+
+    deleted = client.post(f"/activities/{activity_id}/delete")
+    assert deleted.status_code == 303
+    after_delete = client.get("/activities")
+    assert 'data-metric="activity-count"><strong>0</strong>' in after_delete.text
+    assert 'data-metric="total-minutes"><strong>0</strong>' in after_delete.text
+    assert 'data-metric="total-bags"><strong>0</strong>' in after_delete.text
 
 
 def test_missing_activity_is_404(client, user):
