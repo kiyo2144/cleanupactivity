@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}活動の詳細 | ひろまち{% endblock %}
-{% block head %}{% if route_points %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}">{% endif %}{% endblock %}
+{% block head %}{% if route_points %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css', v=config['STATIC_ASSET_VERSION']) }}">{% endif %}{% endblock %}
 {% block content %}
   <article class="panel detail-list">
     <h1>活動の詳細</h1>
@@ -45,7 +45,7 @@
     </div>
   </article>
   {% if route_points %}
-    <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/activity-route-map.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
+    <script src="{{ url_for('static', filename='js/activity-route-map.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
   {% endif %}
 {% endblock %}

@@ -45,6 +45,8 @@ def load_config(instance_path: str) -> dict[str, object]:
         "PHOTO_MAX_BYTES": photo_max_bytes,
         "PHOTO_MAX_DIMENSION": 2000,
         "MAX_CONTENT_LENGTH": photo_max_bytes + (512 * 1024),
+        # Increment this value whenever a CSS or JavaScript asset changes.
+        "STATIC_ASSET_VERSION": "20261015-1",
         "SESSION_TYPE": "cachelib",
         "SESSION_SERIALIZATION_FORMAT": "json",
         "SESSION_PERMANENT": True,

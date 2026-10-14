@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}清掃活動の記録 | ひろまち{% endblock %}
-{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css', v=config['STATIC_ASSET_VERSION']) }}">{% endblock %}
 {% block content %}
   <section class="panel form-panel">
     <h1>清掃活動の記録</h1>
@@ -8,7 +8,7 @@
     {% set allow_photo_removal = false %}
     {% include "activities/_form.html" %}
   </section>
-  <script src="{{ url_for('static', filename='js/photo-preview.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/activity-route-map.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/photo-preview.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
+  <script src="{{ url_for('static', filename='js/activity-route-map.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
 {% endblock %}
