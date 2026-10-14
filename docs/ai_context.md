@@ -104,6 +104,13 @@ Flaskのルート表には、上記11ルートに静的ファイル用の`static
 
 主な環境変数は`SECRET_KEY`、`DATABASE_PATH`、`SESSION_DIR`、`UPLOAD_DIR`、`SESSION_LIFETIME_DAYS`、`SESSION_COOKIE_SECURE`です。本番では推測できない`SECRET_KEY`とHTTPS用Cookie設定が必要です。
 
+### 公開環境
+
+- PythonAnywhere Beginnerへデプロイ済みです。
+- コードは`~/camp-app`、仮想環境は`~/.virtualenvs/camp-app`を使用します。
+- WSGI入口はリポジトリ直下の`wsgi.py`が公開する`application`です。
+- 更新・確認・バックアップの手順は`docs/deployment.md`を参照します。
+
 ## 8. 基本コマンド
 
 ```powershell
@@ -133,6 +140,7 @@ pytest --cov=hiromachi --cov-report=term-missing
 6. この文書：実装時の要約
 7. `docs/coding_rules.md`：コード変更時の規約
 8. `docs/tasks.md`：現在の進捗と次の作業
+9. `docs/deployment.md`：PythonAnywhereへの反映と運用確認
 
 既存コードと設計資料が食い違う場合は、勝手に片方へ合わせず差異を報告してください。仕様を変更するときは、該当する設計書、実装、テストを同じ作業内で更新します。
 
@@ -147,6 +155,8 @@ pytest --cov=hiromachi --cov-report=term-missing
 - JPEG拡張子のMPOを通常JPEGへ変換する互換処理が実装済みです。
 - 投稿者本人による活動内容と写真の編集が実装済みです。
 - 投稿者本人による確認画面付きの活動削除が実装済みです。
+- PythonAnywhere Beginnerへデプロイ済みです。
+- iPhone実機からの写真投稿とサーバー側の画像変換を確認済みです。
 - 2026年10月14日時点で自動テスト56件が成功しています。
 - 完了済み機能を、明確な理由なく作り直さないでください。
 
