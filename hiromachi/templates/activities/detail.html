@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/_icon.html" import icon %}
 {% block title %}活動の詳細 | ひろまち{% endblock %}
 {% block head %}{% if route_points %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css', v=config['STATIC_ASSET_VERSION']) }}">{% endif %}{% endblock %}
 {% block content %}
@@ -38,19 +39,22 @@
       <dt>コメント・感想</dt><dd>{{ activity.comment or 'コメントなし' }}</dd>
     </dl>
     <section class="activity-thanks" aria-labelledby="activity-thanks-heading">
-      <h2 id="activity-thanks-heading">ありがとう {{ thank_count }}件</h2>
+      <h2 id="activity-thanks-heading" aria-label="ありがとう {{ thank_count }}件">
+        {{ icon('sparkles') }}<span>ありがとう <strong class="thank-count">{{ thank_count }}</strong>件</span>
+      </h2>
       {% if activity.user_id != current_user.id %}
         <form method="post" action="{{ url_for('activities.toggle_thank', activity_id=activity.id) }}">
           {{ thank_form.hidden_tag() }}
           <button class="button secondary" type="submit">
+            {{ icon('sparkles') }}
             {% if has_thanked %}ありがとうを取り消す{% else %}ありがとうを送る{% endif %}
           </button>
         </form>
       {% endif %}
     </section>
     <div class="actions">
-      {% if activity.user_id == current_user.id %}<a class="button secondary" href="{{ url_for('activities.edit', activity_id=activity.id) }}">編集する</a>{% endif %}
-      {% if activity.user_id == current_user.id %}<a class="button danger" href="{{ url_for('activities.delete', activity_id=activity.id) }}">削除する</a>{% endif %}
+      {% if activity.user_id == current_user.id %}<a class="button secondary" href="{{ url_for('activities.edit', activity_id=activity.id) }}">{{ icon('edit') }}<span>編集する</span></a>{% endif %}
+      {% if activity.user_id == current_user.id %}<a class="button danger" href="{{ url_for('activities.delete', activity_id=activity.id) }}">{{ icon('trash') }}<span>削除する</span></a>{% endif %}
       <a href="{{ url_for('activities.index') }}">みんなの活動へ戻る</a>
       {% if activity.user_id == current_user.id %}<a href="{{ url_for('users.me') }}">マイページへ戻る</a>{% endif %}
     </div>

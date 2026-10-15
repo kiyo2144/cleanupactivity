@@ -7,22 +7,31 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=config['STATIC_ASSET_VERSION']) }}">
   {% block head %}{% endblock %}
 </head>
-<body>
+{% set flashed_messages = get_flashed_messages(with_categories=true) %}
+{% set feedback_category = flashed_messages[-1][0] if flashed_messages else '' %}
+<body{% if feedback_category %} data-feedback="{{ feedback_category }}"{% endif %}>
+  {% from "components/_icon.html" import icon %}
   <a class="skip-link" href="#main-content">本文へ移動</a>
   <header class="site-header">
     <div class="site-header-inner">
       <a class="brand" href="{{ url_for('main.index') }}">
-        <span class="brand-mark" aria-hidden="true"></span>
+        <img
+          class="brand-mark-image"
+          src="{{ url_for('static', filename='images/brand/hiromachi-mark.png', v=config['STATIC_ASSET_VERSION']) }}"
+          alt=""
+          width="560"
+          height="428"
+        >
         <span>ひろまち</span>
       </a>
       <nav aria-label="メインナビゲーション">
         {% if current_user.is_authenticated %}
-          <a href="{{ url_for('activities.index') }}">みんなの活動</a>
-          <a href="{{ url_for('activities.create') }}">記録する</a>
-          <a href="{{ url_for('users.me') }}">マイページ</a>
+          <a href="{{ url_for('activities.index') }}">{{ icon('list') }}<span>みんなの活動</span></a>
+          <a href="{{ url_for('activities.create') }}">{{ icon('plus') }}<span>記録する</span></a>
+          <a href="{{ url_for('users.me') }}">{{ icon('user') }}<span>マイページ</span></a>
           <form class="inline-form" method="post" action="{{ url_for('auth.logout') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button class="link-button" type="submit">ログアウト</button>
+            <button class="link-button" type="submit">{{ icon('log-out') }}<span>ログアウト</span></button>
           </form>
         {% else %}
           <a href="{{ url_for('auth.login') }}">ログイン</a>
@@ -33,15 +42,16 @@
   </header>
 
   <main class="container" id="main-content">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <section aria-label="お知らせ">
-          {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-          {% endfor %}
-        </section>
-      {% endif %}
-    {% endwith %}
+    {% if flashed_messages %}
+      <section aria-label="お知らせ">
+        {% for category, message in flashed_messages %}
+          <p class="flash flash-{{ category }}">
+            {% if category in ('success-celebrate', 'success-thanks') %}{{ icon('sparkles') }}{% endif %}
+            <span>{{ message }}</span>
+          </p>
+        {% endfor %}
+      </section>
+    {% endif %}
     {% block content %}{% endblock %}
   </main>
 </body>

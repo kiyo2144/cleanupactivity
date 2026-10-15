@@ -1,3 +1,4 @@
+{% from "components/_icon.html" import icon %}
 <article class="activity-card">
   <div class="card-heading">
     <time datetime="{{ activity.activity_date.isoformat() }}">{{ activity.activity_date.strftime('%Y/%m/%d') }}</time>
@@ -10,5 +11,7 @@
       <span>{{ link.waste_type.name }}</span>
     {% endfor %}
   </p>
-  <a href="{{ url_for('activities.detail', activity_id=activity.id) }}">詳しく見る</a>
+  <a class="card-link" href="{{ url_for('activities.detail', activity_id=activity.id) }}">
+    <span>詳しく見る</span>{{ icon('arrow-right') }}
+  </a>
 </article>

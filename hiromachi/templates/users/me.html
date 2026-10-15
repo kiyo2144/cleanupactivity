@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/_icon.html" import icon %}
 {% block title %}マイページ | ひろまち{% endblock %}
 {% block content %}
   <div class="page-heading">
@@ -6,7 +7,7 @@
       <h1>マイページ</h1>
       <p>{{ current_user.display_name }}さん</p>
     </div>
-    <a class="button primary" href="{{ url_for('activities.create') }}">新しく記録する</a>
+    <a class="button primary" href="{{ url_for('activities.create') }}">{{ icon('plus') }}<span>新しく記録する</span></a>
   </div>
   <section class="summary" aria-label="活動の集計">
     <div><strong>{{ totals.activity_count }}</strong><span>活動回数</span></div>
@@ -28,8 +29,15 @@
     </nav>
   {% else %}
     <section class="empty-state">
+      <img
+        class="brand-logo-full"
+        src="{{ url_for('static', filename='images/brand/hiromachi-logo.png', v=config['STATIC_ASSET_VERSION']) }}"
+        alt="ひろまち"
+        width="720"
+        height="720"
+      >
       <p>まだ活動記録がありません。</p>
-      <a class="button primary" href="{{ url_for('activities.create') }}">最初の活動を記録する</a>
+      <a class="button primary" href="{{ url_for('activities.create') }}">{{ icon('plus') }}<span>最初の活動を記録する</span></a>
     </section>
   {% endif %}
 {% endblock %}

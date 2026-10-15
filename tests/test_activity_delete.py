@@ -81,6 +81,8 @@ def test_delete_activity_and_related_data(client, app, user):
         assert ActivityPhoto.select().count() == 0
     page = client.get(response.headers["Location"])
     assert "活動を削除しました" in page.text
+    assert 'data-feedback="success-neutral"' in page.text
+    assert 'class="flash flash-success-neutral"' in page.text
 
 
 def test_delete_activity_without_photo(client, user):

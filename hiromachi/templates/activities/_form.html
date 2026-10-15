@@ -1,3 +1,4 @@
+{% from "components/_icon.html" import icon %}
 <form method="post" enctype="multipart/form-data" novalidate>
   {{ form.hidden_tag("csrf_token") }}
   <div class="field">
@@ -23,7 +24,7 @@
       aria-controls="activity-route-map"
       aria-describedby="route-location-status route-help"
       {% if form.route_points.data %}hidden{% endif %}
-    >現在地から始める</button>
+    >{{ icon('location') }}<span>現在地から始める</span></button>
     <p class="hint" id="route-location-status" role="status" aria-live="polite" hidden></p>
     <div
       class="route-map"
@@ -102,7 +103,9 @@
     {% for error in form.photo.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
   </div>
   <div class="actions">
-    {{ form.submit(class_="button primary") }}
+    <button class="button primary" id="{{ form.submit.id }}" name="{{ form.submit.name }}" type="submit" value="{{ form.submit.label.text }}">
+      {{ icon('check') }}<span>{{ form.submit.label.text }}</span>
+    </button>
     <a href="{{ cancel_url }}">キャンセル</a>
   </div>
 </form>

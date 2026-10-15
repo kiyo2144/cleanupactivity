@@ -2,6 +2,13 @@
 {% block title %}ユーザー登録 | ひろまち{% endblock %}
 {% block content %}
   <section class="panel form-panel">
+    <img
+      class="brand-logo-full"
+      src="{{ url_for('static', filename='images/brand/hiromachi-logo.png', v=config['STATIC_ASSET_VERSION']) }}"
+      alt="ひろまち"
+      width="720"
+      height="720"
+    >
     <h1>ユーザー登録</h1>
     <p>ログインIDはログインに、お名前は活動の投稿者名として表示されます。</p>
     <p class="required-note"><span class="required-mark" aria-hidden="true">*</span> は必須項目です。</p>

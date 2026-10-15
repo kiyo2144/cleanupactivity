@@ -67,6 +67,7 @@
   let accuracyLayer = null;
   let locating = false;
   let locationRequestId = 0;
+  let animatedPointIndex = null;
 
   const clearAccuracy = () => {
     if (accuracyLayer) map.removeLayer(accuracyLayer);
@@ -93,6 +94,9 @@
           keyboard: true,
           title: "始点（ドラッグして修正）",
         }).addTo(pointLayer);
+        if (index === animatedPointIndex) {
+          marker.getElement()?.querySelector("span")?.classList.add("route-point-added");
+        }
         marker.on("dragstart", clearAccuracy);
         marker.on("dragend", (event) => {
           const position = event.target.getLatLng();
@@ -106,13 +110,16 @@
         });
         return;
       }
-      window.L.circleMarker(point, {
+      const pointMarker = window.L.circleMarker(point, {
         radius: 5,
         color: "#294d3a",
         fillColor: "#f2c75c",
         fillOpacity: 1,
         weight: 2,
       }).addTo(pointLayer);
+      if (index === animatedPointIndex) {
+        pointMarker.getElement()?.classList.add("route-point-added");
+      }
     });
     if (input) input.value = points.length ? JSON.stringify(points) : "";
     if (mode === "edit") {
@@ -125,6 +132,7 @@
       );
       updateLocationButton();
     }
+    animatedPointIndex = null;
   };
 
   const finishLocationRequest = () => {
@@ -178,6 +186,7 @@
             Number(position.coords.longitude.toFixed(6)),
           ];
           points.push(point);
+          animatedPointIndex = points.length - 1;
           clearAccuracy();
           if (Number.isFinite(position.coords.accuracy) && position.coords.accuracy > 0) {
             accuracyLayer = window.L.circle(point, {
@@ -213,6 +222,7 @@
         Number(event.latlng.lat.toFixed(6)),
         Number(event.latlng.lng.toFixed(6)),
       ]);
+      animatedPointIndex = points.length - 1;
       update();
     });
     undoButton?.addEventListener("click", () => {

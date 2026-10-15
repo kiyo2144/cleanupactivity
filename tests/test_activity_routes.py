@@ -43,9 +43,9 @@ def test_create_page_has_optional_route_map(client, user):
     assert location_button is not None
     assert "hidden" not in location_button.group(0)
     assert 'id="route-location-status"' in response.text
-    assert "/static/vendor/leaflet/leaflet.css?v=20261016-1" in response.text
-    assert "/static/vendor/leaflet/leaflet.js?v=20261016-1" in response.text
-    assert "/static/js/activity-route-map.js?v=20261016-1" in response.text
+    assert "/static/vendor/leaflet/leaflet.css?v=20261016-2" in response.text
+    assert "/static/vendor/leaflet/leaflet.js?v=20261016-2" in response.text
+    assert "/static/js/activity-route-map.js?v=20261016-2" in response.text
 
 
 def test_create_without_route_remains_supported(client, user):
@@ -85,7 +85,7 @@ def test_create_route_rounds_endpoints_and_shows_logged_in_users(client, user):
     assert detail.status_code == 200
     assert "清掃ルート" in detail.text
     assert 'data-route-mode="view"' in detail.text
-    assert "/static/js/activity-route-map.js?v=20261016-1" in detail.text
+    assert "/static/js/activity-route-map.js?v=20261016-2" in detail.text
 
 
 @pytest.mark.parametrize(
@@ -189,19 +189,20 @@ def test_delete_activity_cascades_to_route(client, user):
 
 
 def test_map_static_files_are_served(client):
-    script = client.get("/static/js/activity-route-map.js?v=20261016-1")
+    script = client.get("/static/js/activity-route-map.js?v=20261016-2")
     assert script.status_code == 200
     assert "navigator.geolocation.getCurrentPosition" in script.text
     assert "enableHighAccuracy: true" in script.text
     assert "timeout: 10000" in script.text
     assert "maximumAge: 0" in script.text
     assert "draggable: true" in script.text
+    assert 'classList.add("route-point-added")' in script.text
     assert "現在地の利用が許可されませんでした" in script.text
     assert (
-        client.get("/static/vendor/leaflet/leaflet.css?v=20261016-1").status_code
+        client.get("/static/vendor/leaflet/leaflet.css?v=20261016-2").status_code
         == 200
     )
     assert (
-        client.get("/static/vendor/leaflet/leaflet.js?v=20261016-1").status_code
+        client.get("/static/vendor/leaflet/leaflet.js?v=20261016-2").status_code
         == 200
     )

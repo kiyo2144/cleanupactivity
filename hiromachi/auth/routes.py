@@ -35,7 +35,10 @@ def register():
         except IntegrityError:
             form.username.errors.append("このログインIDは使用できません。")
         else:
-            flash("ユーザー登録が完了しました。ログインしてください。", "success")
+            flash(
+                "ユーザー登録が完了しました。ログインしてください。",
+                "success-celebrate",
+            )
             return redirect(url_for("auth.login"), code=303)
 
     return render_template("auth/register.html", form=form)
@@ -52,7 +55,7 @@ def login():
         user = User.get_or_none(User.username == username)
         if user is not None and check_password_hash(user.password_hash, form.password.data):
             login_user(user)
-            flash("ログインしました。", "success")
+            flash("ログインしました。", "success-celebrate")
             return redirect(url_for("activities.index"), code=303)
         form.password.errors.append("ログインIDまたはパスワードが正しくありません。")
 
@@ -65,6 +68,6 @@ def logout():
     form = LogoutForm()
     if form.validate_on_submit():
         logout_user()
-        flash("ログアウトしました。", "success")
+        flash("ログアウトしました。", "success-neutral")
         return redirect(url_for("auth.login"), code=303)
     return render_template("errors/400.html"), 400

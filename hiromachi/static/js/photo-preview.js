@@ -32,6 +32,7 @@
     image.onload = null;
     image.onerror = null;
     image.removeAttribute("src");
+    preview.classList.remove("is-visible");
     preview.hidden = true;
     releaseObjectUrl();
   };
@@ -88,6 +89,9 @@
     objectUrl = URL.createObjectURL(file);
     image.onload = () => {
       preview.hidden = false;
+      preview.classList.remove("is-visible");
+      void preview.offsetWidth;
+      preview.classList.add("is-visible");
     };
     image.onerror = () => {
       rejectFile("画像を読み込めませんでした。別の写真を選んでください。");

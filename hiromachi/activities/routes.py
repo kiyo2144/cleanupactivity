@@ -218,7 +218,7 @@ def create():
                 if stored_path is not None:
                     stored_path.unlink(missing_ok=True)
                 raise
-            flash("活動を記録しました。", "success")
+            flash("活動を記録しました。", "success-celebrate")
             return redirect(
                 url_for("activities.detail", activity_id=activity.id), code=303
             )
@@ -285,7 +285,7 @@ def toggle_thank(activity_id: int):
             reaction.delete_instance()
             message = "ありがとうを取り消しました。"
 
-    flash(message, "success")
+    flash(message, "success-thanks")
     return redirect(
         url_for("activities.detail", activity_id=activity.id), code=303
     )
@@ -378,7 +378,7 @@ def edit(activity_id: int):
                 raise
 
             _remove_replaced_photo(old_stored_path, activity.id)
-            flash("活動を更新しました。", "success")
+            flash("活動を更新しました。", "success-celebrate")
             return redirect(
                 url_for("activities.detail", activity_id=activity.id), code=303
             )
@@ -411,7 +411,7 @@ def delete(activity_id: int):
             activity.delete_instance()
 
         _remove_deleted_photo(photo_path, activity_id)
-        flash("活動を削除しました。", "success")
+        flash("活動を削除しました。", "success-neutral")
         return redirect(url_for("users.me"), code=303)
 
     return render_template(

@@ -55,6 +55,8 @@ def test_thank_can_be_sent_and_cancelled(client, user):
     assert sent.headers["Location"].endswith(f"/activities/{activity.id}")
     after_send = client.get(sent.headers["Location"])
     assert "ありがとうを送りました" in after_send.text
+    assert 'data-feedback="success-thanks"' in after_send.text
+    assert 'class="flash flash-success-thanks"' in after_send.text
     assert "ありがとう 1件" in after_send.text
     assert "ありがとうを取り消す" in after_send.text
     with database_proxy.connection_context():

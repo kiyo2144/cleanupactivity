@@ -2,6 +2,13 @@
 {% block title %}ログイン | ひろまち{% endblock %}
 {% block content %}
   <section class="panel form-panel">
+    <img
+      class="brand-logo-full"
+      src="{{ url_for('static', filename='images/brand/hiromachi-logo.png', v=config['STATIC_ASSET_VERSION']) }}"
+      alt="ひろまち"
+      width="720"
+      height="720"
+    >
     <h1>ログイン</h1>
     <form method="post" novalidate>
       {{ form.hidden_tag() }}
