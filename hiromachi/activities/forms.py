@@ -116,3 +116,7 @@ class ActivityEditForm(ActivityForm):
 
 class ActivityDeleteForm(FlaskForm):
     submit = SubmitField("削除する")
+
+
+class ThankForm(FlaskForm):
+    submit = SubmitField("ありがとうを送る")

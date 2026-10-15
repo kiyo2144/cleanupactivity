@@ -12,7 +12,7 @@ APIやJSONレスポンスは提供せず、JinjaテンプレートによるHTML�
 | --- | --- | --- |
 | `main` | アプリの入口 | `main.index` |
 | `auth` | ユーザー登録と認証 | `auth.register`、`auth.login`、`auth.logout` |
-| `activities` | 活動の一覧、作成、詳細、編集、削除、写真配信 | `activities.index`、`activities.create`、`activities.detail`、`activities.edit`、`activities.delete`、`activities.photo` |
+| `activities` | 活動の一覧、作成、詳細、編集、削除、写真配信、リアクション | `activities.index`、`activities.create`、`activities.detail`、`activities.edit`、`activities.delete`、`activities.photo`、`activities.toggle_thank` |
 | `users` | ログイン利用者のマイページ | `users.me` |
 
 ## 3. ルート一覧
@@ -29,6 +29,7 @@ APIやJSONレスポンスは提供せず、JinjaテンプレートによるHTML�
 | `/activities/<int:activity_id>/edit` | GET, POST | `activities.edit` | 必要・本人限定 | `activities/edit.html` | 活動編集フォームの表示と更新 |
 | `/activities/<int:activity_id>/delete` | GET, POST | `activities.delete` | 必要・本人限定 | `activities/delete.html` | 削除確認と完全削除 |
 | `/activities/<int:activity_id>/photo` | GET | `activities.photo` | 必要 | なし | 活動写真の配信 |
+| `/activities/<int:activity_id>/thanks` | POST | `activities.toggle_thank` | 必要・他人の活動限定 | なし | 「ありがとう」の送信・取消 |
 | `/me` | GET | `users.me` | 必要 | `users/me.html` | 自分の集計と活動一覧 |
 
 ## 4. ルートごとの処理
@@ -216,6 +217,7 @@ APIやJSONレスポンスは提供せず、JinjaテンプレートによるHTML�
 - 指定IDの活動と投稿者を取得し、HTTP 200で表示する。
 - 写真がある場合は、`activities.photo`を参照する画像を詳細画面だけに表示する。
 - 清掃ルートがある場合は、始点・終点を丸めた保存済み座標をOpenStreetMap上へ表示する。
+- 「ありがとう」の合計件数を表示し、他人の活動ではログイン利用者の送信状態に応じた送信・取消フォームを表示する。
 - 読み取りだけを行い、データは変更しない。
 
 **エラー時**
@@ -313,7 +315,32 @@ APIやJSONレスポンスは提供せず、JinjaテンプレートによるHTML�
 - 未ログイン時は`auth.login`へ302リダイレクトする。
 - 写真情報または画像実体が存在しない場合は404を返す。
 
-### 4.11 マイページ
+### 4.11 「ありがとう」の送信・取消
+
+**リクエスト**
+
+- URL：`/activities/<int:activity_id>/thanks`
+- メソッド：POST
+- エンドポイント：`activities.toggle_thank`
+- ログイン：必要・他人の活動限定
+- テンプレート：なし
+
+**正常時**
+
+1. CSRFトークンを検証する。
+2. 対象活動が存在し、投稿者がログイン利用者本人ではないことをサーバー側で確認する。
+3. 未送信ならリアクションを1件作成し、送信済みならログイン利用者自身のリアクションを削除する。
+4. 成功メッセージを設定し、対象の`activities.detail`へ303リダイレクトする。
+
+**エラー時**
+
+- 未ログイン時は`auth.login`へ302リダイレクトし、データを変更しない。
+- GETなどPOST以外のメソッドは405を返す。
+- CSRFエラーまたは本人の活動への送信は400を返し、データを変更しない。
+- 指定活動が存在しない場合は404を返す。
+- DB障害は変更を取り消して500を返す。
+
+### 4.12 マイページ
 
 **リクエスト**
 
@@ -383,20 +410,26 @@ APIやJSONレスポンスは提供せず、JinjaテンプレートによるHTML�
 - 入力項目は設けず、CSRFトークンと「削除する」送信ボタンだけを持つ。
 - 文字入力、チェックボックス、パスワード再入力は要求しない。
 
+### 5.6 「ありがとう」フォーム
+
+- CSRFトークンと送信ボタンだけを持つ。
+- 活動IDや利用者IDをフォーム値として信用せず、URLとログイン状態からサーバー側で決定する。
+
 ## 6. 認証とアクセス制御
 
-- `activities.index`、`activities.create`、`activities.detail`、`activities.edit`、`activities.delete`、`activities.photo`、`users.me`、`auth.logout`はログイン必須とする。
+- `activities.index`、`activities.create`、`activities.detail`、`activities.edit`、`activities.delete`、`activities.photo`、`activities.toggle_thank`、`users.me`、`auth.logout`はログイン必須とする。
 - 未ログインで保護ルートへアクセスした場合は、案内メッセージを付けて`auth.login`へ302リダイレクトする。
 - 初版ではログイン後の戻り先指定を使用せず、常に`activities.index`へ移動する。
 - 登録・ログイン画面へログイン済みでアクセスした場合も`activities.index`へ移動する。
 - 活動情報は登録ユーザーだけが閲覧できる。
 - `activities.edit`は投稿者本人だけに許可し、他人の活動IDを指定した場合は404を返す。
 - `activities.delete`も投稿者本人だけに許可し、他人の活動IDを指定した場合は404を返す。
+- `activities.toggle_thank`は他人の活動だけに許可し、本人の活動を指定した場合は400を返す。
 
 ## 7. HTTPメソッドとリダイレクト
 
 - GETは画面表示とデータ取得だけに使用し、DBやセッションを変更しない。
-- ユーザー登録、ログイン、活動作成、活動編集、活動削除、ログアウトはPOSTだけで状態を変更する。
+- ユーザー登録、ログイン、活動作成、活動編集、活動削除、「ありがとう」の送信・取消、ログアウトはPOSTだけで状態を変更する。
 - すべてのPOSTフォームをCSRF保護する。
 - POST成功後は303 See OtherでGETルートへリダイレクトする。
 - 通常の画面振り分けと未認証時の案内には302 Foundを使用する。
@@ -434,6 +467,7 @@ APIやJSONレスポンスは提供せず、JinjaテンプレートによるHTML�
 | みんなの活動一覧 | 活動カード | 選択した活動の詳細 |
 | マイページ | 活動カード | 選択した活動の詳細 |
 | 活動詳細 | 「みんなの活動へ戻る」 | みんなの活動一覧 |
+| 他人の活動詳細 | 「ありがとうを送る」「ありがとうを取り消す」 | 同じ活動詳細 |
 | 活動詳細 | 「マイページへ戻る」 | マイページ |
 | 自分の活動詳細 | 「編集する」 | 活動編集 |
 | 活動編集 | 更新成功 | 編集した活動の詳細 |
@@ -453,6 +487,6 @@ APIやJSONレスポンスは提供せず、JinjaテンプレートによるHTML�
 
 - 削除した活動の復元、論理削除、一定期間の削除保留
 - ユーザープロフィールの編集
-- ランキング、リアクション、コメント、フォロー
+- ランキング、コメント、フォロー、「ありがとう」以外のリアクション
 - メール認証、パスワード再設定
 - JSON API

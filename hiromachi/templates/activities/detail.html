@@ -37,6 +37,17 @@
       <dd>{% for link in activity.waste_type_links %}{{ link.waste_type.name }}{% if not loop.last %}、{% endif %}{% endfor %}</dd>
       <dt>コメント・感想</dt><dd>{{ activity.comment or 'コメントなし' }}</dd>
     </dl>
+    <section class="activity-thanks" aria-labelledby="activity-thanks-heading">
+      <h2 id="activity-thanks-heading">ありがとう {{ thank_count }}件</h2>
+      {% if activity.user_id != current_user.id %}
+        <form method="post" action="{{ url_for('activities.toggle_thank', activity_id=activity.id) }}">
+          {{ thank_form.hidden_tag() }}
+          <button class="button secondary" type="submit">
+            {% if has_thanked %}ありがとうを取り消す{% else %}ありがとうを送る{% endif %}
+          </button>
+        </form>
+      {% endif %}
+    </section>
     <div class="actions">
       {% if activity.user_id == current_user.id %}<a class="button secondary" href="{{ url_for('activities.edit', activity_id=activity.id) }}">編集する</a>{% endif %}
       {% if activity.user_id == current_user.id %}<a class="button danger" href="{{ url_for('activities.delete', activity_id=activity.id) }}">削除する</a>{% endif %}

@@ -14,7 +14,7 @@ def test_pages_use_versioned_main_stylesheet(client):
     response = client.get("/login")
 
     assert response.status_code == 200
-    assert '/static/css/style.css?v=20261015-1' in response.text
+    assert '/static/css/style.css?v=20261016-1' in response.text
 
 
 def test_production_requires_secret_key(monkeypatch, tmp_path):

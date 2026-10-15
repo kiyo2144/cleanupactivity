@@ -15,6 +15,7 @@ def test_init_db_is_repeatable(runner):
             "activity_photos",
             "activity_routes",
             "activity_waste_types",
+            "reactions",
             "users",
             "waste_types",
         }

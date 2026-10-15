@@ -23,12 +23,13 @@ from ..models import (
     ActivityPhoto,
     ActivityRoute,
     ActivityWasteType,
+    Reaction,
     User,
     WasteType,
     utc_now,
 )
 from . import blueprint
-from .forms import ActivityDeleteForm, ActivityEditForm, ActivityForm
+from .forms import ActivityDeleteForm, ActivityEditForm, ActivityForm, ThankForm
 from .images import PhotoValidationError, process_photo, store_photo
 
 PAGE_SIZE = 10
@@ -239,13 +240,54 @@ def detail(activity_id: int):
     activity = activities[0]
     photo = ActivityPhoto.get_or_none(ActivityPhoto.activity == activity.id)
     activity_route = ActivityRoute.get_or_none(ActivityRoute.activity == activity.id)
+    thank_count = Reaction.select().where(Reaction.activity == activity.id).count()
+    has_thanked = (
+        activity.user_id != current_user.id
+        and Reaction.get_or_none(
+            (Reaction.activity == activity.id) & (Reaction.user == current_user.id)
+        )
+        is not None
+    )
     return render_template(
         "activities/detail.html",
         activity=activity,
         photo=photo,
+        thank_count=thank_count,
+        has_thanked=has_thanked,
+        thank_form=ThankForm(),
         route_points=_route_points(
             activity_route.points_json if activity_route is not None else None
         ),
+    )
+
+
+@blueprint.post("/activities/<int:activity_id>/thanks")
+@login_required
+def toggle_thank(activity_id: int):
+    form = ThankForm()
+    if not form.validate_on_submit():
+        abort(400)
+
+    activity = Activity.get_or_none(Activity.id == activity_id)
+    if activity is None:
+        abort(404)
+    if activity.user_id == current_user.id:
+        abort(400)
+
+    with database_proxy.atomic():
+        reaction = Reaction.get_or_none(
+            (Reaction.activity == activity.id) & (Reaction.user == current_user.id)
+        )
+        if reaction is None:
+            Reaction.create(user=current_user.id, activity=activity.id)
+            message = "ありがとうを送りました。"
+        else:
+            reaction.delete_instance()
+            message = "ありがとうを取り消しました。"
+
+    flash(message, "success")
+    return redirect(
+        url_for("activities.detail", activity_id=activity.id), code=303
     )
 
 

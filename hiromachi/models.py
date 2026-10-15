@@ -162,6 +162,24 @@ class ActivityRoute(BaseModel):
         table_name = "activity_routes"
 
 
+class Reaction(BaseModel):
+    user = ForeignKeyField(
+        User,
+        backref="reactions",
+        on_delete="RESTRICT",
+    )
+    activity = ForeignKeyField(
+        Activity,
+        backref="reactions",
+        on_delete="CASCADE",
+    )
+    created_at = DateTimeField(default=utc_now)
+
+    class Meta:
+        table_name = "reactions"
+        primary_key = CompositeKey("user", "activity")
+
+
 INITIAL_WASTE_TYPES = (
     {"code": "burnable", "name": "燃えるごみ", "sort_order": 1},
     {
@@ -180,4 +198,5 @@ INITIAL_MODELS = (
     ActivityWasteType,
     ActivityPhoto,
     ActivityRoute,
+    Reaction,
 )

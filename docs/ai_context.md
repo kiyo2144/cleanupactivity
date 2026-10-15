@@ -51,10 +51,10 @@ MVPの基本導線は次のとおりです。
 - `hiromachi/config.py`：環境変数からの設定読込
 - `hiromachi/extensions.py`：LoginManager、Session、CSRFProtect
 - `hiromachi/database.py`：Peewee接続の初期化と開閉
-- `hiromachi/models.py`：現在の6モデル
+- `hiromachi/models.py`：現在の7モデル
 - `hiromachi/commands.py`：`flask init-db`
 - `hiromachi/auth/`：ユーザー登録、ログイン、ログアウト
-- `hiromachi/activities/`：活動一覧、作成、詳細、画像処理と配信
+- `hiromachi/activities/`：活動一覧、作成、詳細、画像処理と配信、「ありがとう」
 - `hiromachi/users/`：マイページ
 - `hiromachi/errors/`：400、404、413、500ハンドラー
 - `hiromachi/templates/`：Jinjaテンプレート
@@ -77,13 +77,14 @@ Blueprintは`main`、`auth`、`activities`、`users`に分かれています。
 | `activities.edit` | GET, POST | `/activities/<int:activity_id>/edit` | 本人限定の活動編集 |
 | `activities.delete` | GET, POST | `/activities/<int:activity_id>/delete` | 本人限定の活動削除 |
 | `activities.photo` | GET | `/activities/<int:activity_id>/photo` | 認証付き活動写真配信 |
+| `activities.toggle_thank` | POST | `/activities/<int:activity_id>/thanks` | 他人の活動への「ありがとう」の送信・取消 |
 | `users.me` | GET | `/me` | 自分の活動と集計 |
 
-Flaskのルート表には、上記11ルートに静的ファイル用の`static`を加えた12ルートがあります。
+Flaskのルート表には、上記12ルートに静的ファイル用の`static`を加えた13ルートがあります。
 
 ## 6. 初版のデータ
 
-現在使用するテーブルは次の6つです。
+現在使用するテーブルは次の7つです。
 
 - `users`
 - `activities`
@@ -91,6 +92,7 @@ Flaskのルート表には、上記11ルートに静的ファイル用の`static
 - `activity_waste_types`
 - `activity_photos`
 - `activity_routes`
+- `reactions`
 
 活動とゴミの種類は中間テーブルによる多対多です。活動作成・編集と種類、写真、任意の清掃ルートは同じトランザクションで保存します。
 
@@ -151,7 +153,7 @@ pytest --cov=hiromachi --cov-report=term-missing
 ## 10. 現在の状態
 
 - MVPのコードは実装済みです。
-- Flaskのアプリルート11件と静的ファイルルートが登録済みです。
+- Flaskのアプリルート12件と静的ファイルルートが登録済みです。
 - 任意の活動写真1枚の登録と認証付き表示が実装済みです。
 - 活動一覧に全利用者・全期間の活動回数、累計時間、累計袋数を表示します。
 - HEIC・HEIFをJPEGまたはPNGへ変換するアップロードが実装済みです。
@@ -161,9 +163,10 @@ pytest --cov=hiromachi --cov-report=term-missing
 - 地図上で手動入力する任意の清掃ルートと、ログイン利用者向けの詳細表示がローカル実装済みです。PythonAnywhereへの反映は未実施です。
 - 空のルートでは、ボタン操作による1回の現在地取得と、ドラッグによる始点修正がローカル実装済みです。
 - 清掃ルートの始点と終点はサーバー側で小数点以下3桁へ丸めて保存します。
+- 他人の活動へ1人1件だけ送信・取消できる「ありがとう」と、詳細画面の合計件数表示が実装済みです。
 - PythonAnywhere Beginnerへデプロイ済みです。
 - iPhone実機からの写真投稿とサーバー側の画像変換を確認済みです。
-- 2026年10月14日時点で自動テスト71件が成功しています。
+- 2026年10月16日時点で自動テスト80件が成功しています。
 - 完了済み機能を、明確な理由なく作り直さないでください。
 
 ## 11. 初版の対象外
@@ -174,6 +177,6 @@ pytest --cov=hiromachi --cov-report=term-missing
 - メールアドレス、メール認証、パスワード再設定
 - GPSによる連続・バックグラウンド記録、住所検索、複数ルート
 - ランキング、バッジ、連続記録
-- コメント、リアクション、フォロー
+- コメント、フォロー、「ありがとう」以外のリアクション
 - 清掃イベント、通知
 - 外部ストレージ、管理者画面、JSON API

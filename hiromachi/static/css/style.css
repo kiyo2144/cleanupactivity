@@ -408,6 +408,8 @@ input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: var(--pr
 
 .activity-route { margin-block: 2rem; }
 .activity-route h2 { margin-bottom: 0.25rem; }
+.activity-thanks { margin-block: 2rem; }
+.activity-thanks h2 { margin-bottom: 0.75rem; }
 
 .required-note {
   margin-block: 0.75rem 1.25rem;
