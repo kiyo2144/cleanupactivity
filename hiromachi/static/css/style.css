@@ -691,6 +691,47 @@ body[data-feedback="success-thanks"] .activity-thanks h2 > .icon {
   gap: clamp(1rem, 3vw, 1.6rem);
 }
 
+.card-route-preview {
+  position: relative;
+  isolation: isolate;
+  height: 160px;
+  margin-block: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: var(--surface-soft);
+}
+
+.card-route-map {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.card-route-link {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  border-radius: inherit;
+}
+
+.card-route-link:focus-visible { outline-offset: -4px; }
+.card-route-map .leaflet-control-attribution { pointer-events: auto; }
+.card-route-status {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  right: 0.4rem;
+  z-index: 600;
+  margin: 0;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.4rem;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
 .activity-card {
   position: relative;
   padding: clamp(1.2rem, 3vw, 1.7rem);

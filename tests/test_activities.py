@@ -50,11 +50,11 @@ def test_create_page_has_accessible_quantity_steppers(client, user):
     assert 'id="duration_minutes"' in response.text
     assert 'id="bag_count"' in response.text
     assert 'value=""' in response.text
-    assert "/static/js/quantity-stepper.js?v=20261017-2" in response.text
+    assert "/static/js/quantity-stepper.js?v=20261017-3" in response.text
 
 
 def test_quantity_stepper_script_is_served(client):
-    script = client.get("/static/js/quantity-stepper.js?v=20261017-2")
+    script = client.get("/static/js/quantity-stepper.js?v=20261017-3")
 
     assert script.status_code == 200
     assert script.mimetype == "text/javascript"
@@ -131,13 +131,13 @@ def test_create_shows_linked_error_summary_for_all_invalid_fields(client, user):
     assert "清掃ルート：清掃ルートの形式が正しくありません。" in response.text
     assert 'aria-invalid="true"' in response.text
     assert "field-has-error" in response.text
-    assert "/static/js/activity-form-errors.js?v=20261017-2" in response.text
+    assert "/static/js/activity-form-errors.js?v=20261017-3" in response.text
     with database_proxy.connection_context():
         assert Activity.select().count() == 0
 
 
 def test_activity_form_error_script_is_served(client):
-    script = client.get("/static/js/activity-form-errors.js?v=20261017-2")
+    script = client.get("/static/js/activity-form-errors.js?v=20261017-3")
 
     assert script.status_code == 200
     assert script.mimetype == "text/javascript"

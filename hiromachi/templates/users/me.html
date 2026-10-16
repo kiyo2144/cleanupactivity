@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% from "components/_icon.html" import icon %}
 {% block title %}マイページ | ひろまち{% endblock %}
+{% block head %}
+  {% if route_previews %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css', v=config['STATIC_ASSET_VERSION']) }}">{% endif %}
+{% endblock %}
 {% block content %}
   <div class="page-heading">
     <div>
@@ -51,5 +54,9 @@
       <p>まだ活動記録がありません。</p>
       <a class="button primary" href="{{ url_for('activities.create') }}">{{ icon('plus') }}<span>最初の活動を記録する</span></a>
     </section>
+  {% endif %}
+  {% if route_previews %}
+    <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
+    <script src="{{ url_for('static', filename='js/activity-route-previews.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
   {% endif %}
 {% endblock %}

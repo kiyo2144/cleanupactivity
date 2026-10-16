@@ -56,6 +56,19 @@ def _activity_page(query):
     return activities, page, total_pages
 
 
+def _activity_route_previews(activities) -> dict[int, list]:
+    """Load saved route coordinates only for the activities on this page."""
+    activity_ids = [activity.id for activity in activities]
+    if not activity_ids:
+        return {}
+    return {
+        route.activity_id: json.loads(route.points_json)
+        for route in ActivityRoute.select(
+            ActivityRoute.activity, ActivityRoute.points_json
+        ).where(ActivityRoute.activity.in_(activity_ids))
+    }
+
+
 def _waste_types_for_form(form):
     waste_types = list(WasteType.select().order_by(WasteType.sort_order))
     form.waste_types.choices = [(item.id, item.name) for item in waste_types]
@@ -170,6 +183,7 @@ def index():
         "activities/index.html",
         totals=totals,
         activities=activities,
+        route_previews=_activity_route_previews(activities),
         page=page,
         total_pages=total_pages,
     )

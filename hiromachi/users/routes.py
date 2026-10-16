@@ -4,7 +4,7 @@ from flask import render_template
 from flask_login import current_user, login_required
 from peewee import fn
 
-from ..activities.routes import _activity_page
+from ..activities.routes import _activity_page, _activity_route_previews
 from ..activities.forms import today_in_japan
 from ..models import Activity, User
 from . import blueprint
@@ -45,6 +45,7 @@ def me():
         monthly_totals=monthly_totals,
         month_label=f"{month_start.year}年{month_start.month}月",
         activities=activities,
+        route_previews=_activity_route_previews(activities),
         page=page,
         total_pages=total_pages,
     )

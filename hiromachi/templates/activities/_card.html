@@ -5,6 +5,13 @@
     <span>{{ activity.user.display_name }}さん</span>
   </div>
   <h2>{{ activity.location }}</h2>
+  {% if route_previews.get(activity.id) %}
+    <div class="card-route-preview" data-route-preview data-route-points='{{ route_previews[activity.id]|tojson }}'>
+      <div class="card-route-map" data-preview-map></div>
+      <a class="card-route-link" href="{{ url_for('activities.detail', activity_id=activity.id) }}" aria-label="{{ activity.location }}の清掃地点・ルートを詳しく見る"></a>
+      <p class="card-route-status" data-preview-status>清掃地点・ルートは詳細で確認できます。</p>
+    </div>
+  {% endif %}
   <p>{{ activity.duration_minutes }}分・{{ activity.bag_count }}袋</p>
   <p class="tags">
     {% for link in activity.waste_type_links %}
