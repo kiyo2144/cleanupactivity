@@ -9,7 +9,19 @@
     </div>
     <a class="button primary" href="{{ url_for('activities.create') }}">{{ icon('plus') }}<span>新しく記録する</span></a>
   </div>
-  <section class="summary" aria-label="活動の集計">
+  <h2 id="monthly-summary-heading">今月の活動実績</h2>
+  <p>{{ month_label }}</p>
+  {% if monthly_totals.activity_count == 0 %}
+    <p>今月の記録はまだありません。自分のペースで記録しましょう。</p>
+  {% endif %}
+  <section class="summary" aria-labelledby="monthly-summary-heading">
+    <div><strong>{{ monthly_totals.activity_count }}</strong><span>活動回数</span></div>
+    <div><strong>{{ monthly_totals.total_minutes }}</strong><span>合計時間（分）</span></div>
+    <div><strong>{{ monthly_totals.total_bags }}</strong><span>合計袋数</span></div>
+  </section>
+
+  <h2 id="all-time-summary-heading">これまでの実績</h2>
+  <section class="summary" aria-labelledby="all-time-summary-heading">
     <div><strong>{{ totals.activity_count }}</strong><span>活動回数</span></div>
     <div><strong>{{ totals.total_minutes }}</strong><span>累計時間（分）</span></div>
     <div><strong>{{ totals.total_bags }}</strong><span>累計袋数</span></div>
