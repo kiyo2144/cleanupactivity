@@ -363,6 +363,69 @@ textarea:focus {
 
 textarea { resize: vertical; }
 
+.quantity-stepper {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.quantity-stepper.is-enhanced {
+  display: grid;
+  grid-template-columns: minmax(2.75rem, 3.25rem) minmax(0, 1fr) minmax(2.75rem, 3.25rem);
+  align-items: stretch;
+  gap: 0.55rem;
+}
+
+.quantity-stepper input[type="number"] {
+  min-height: 3.25rem;
+  padding-inline: 0.5rem;
+  text-align: center;
+}
+
+.quantity-stepper-button {
+  display: none;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--strong-border);
+  border-radius: 0.7rem;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 2px 2px 0 var(--strong-border);
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.quantity-stepper.is-enhanced .quantity-stepper-button { display: inline-flex; }
+.quantity-stepper-decrease { background: var(--surface-soft); }
+.quantity-stepper-increase { background: var(--yellow); }
+
+.quantity-stepper-button:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.quantity-stepper-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.quantity-stepper.is-enhanced input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.quantity-stepper.is-enhanced input[type="number"]::-webkit-inner-spin-button,
+.quantity-stepper.is-enhanced input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
 .checkbox-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -568,6 +631,14 @@ input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: var(--pr
 
 .primary { background: var(--primary); color: #fff; }
 .primary:hover { background: var(--primary-dark); }
+
+input.button.primary.auth-submit {
+  border-color: var(--primary-dark);
+  background: var(--primary);
+  color: #fff;
+}
+
+input.button.primary.auth-submit:hover { background: var(--primary-dark); }
 
 .danger { background: var(--danger); color: #fff; }
 .danger:hover { background: #84312c; }

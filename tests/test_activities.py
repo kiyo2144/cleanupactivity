@@ -31,6 +31,41 @@ def test_activity_routes_require_login(client):
     assert client.get("/me").status_code == 302
 
 
+def test_create_page_has_accessible_quantity_steppers(client, user):
+    login(client)
+
+    response = client.get("/activities/new")
+
+    assert response.status_code == 200
+    assert response.text.count('data-quantity-stepper') == 2
+    assert 'data-step="5"' in response.text
+    assert 'data-step="1"' in response.text
+    assert 'data-initial="5"' in response.text
+    assert 'data-initial="1"' in response.text
+    assert 'aria-label="所要時間を5分減らす"' in response.text
+    assert 'aria-label="所要時間を5分増やす"' in response.text
+    assert 'aria-label="ゴミの袋数を1袋減らす"' in response.text
+    assert 'aria-label="ゴミの袋数を1袋増やす"' in response.text
+    assert 'inputmode="numeric"' in response.text
+    assert 'id="duration_minutes"' in response.text
+    assert 'id="bag_count"' in response.text
+    assert 'value=""' in response.text
+    assert "/static/js/quantity-stepper.js?v=20261017-1" in response.text
+
+
+def test_quantity_stepper_script_is_served(client):
+    script = client.get("/static/js/quantity-stepper.js?v=20261017-1")
+
+    assert script.status_code == 200
+    assert script.mimetype == "text/javascript"
+    assert 'document.querySelectorAll("[data-quantity-stepper]")' in script.text
+    assert "decreaseButton.disabled = value === null || value <= minimum" in script.text
+    assert "increaseButton.disabled = value !== null && value >= maximum" in script.text
+    assert "value === null ? initialValue" in script.text
+    assert "Math.min(maximum, Math.max(minimum, candidate))" in script.text
+    assert 'new Event("input", { bubbles: true })' in script.text
+
+
 def test_create_activity_and_show_detail(client, user):
     login(client)
     response = client.post("/activities/new", data=activity_data())
@@ -58,6 +93,10 @@ def test_create_rejects_future_date(client, user):
 
     assert response.status_code == 200
     assert "未来の日付は指定できません" in response.text
+    assert 'name="duration_minutes"' in response.text
+    assert 'value="30"' in response.text
+    assert 'name="bag_count"' in response.text
+    assert 'value="1"' in response.text
     with database_proxy.connection_context():
         assert Activity.select().count() == 0
 
@@ -92,13 +131,13 @@ def test_create_shows_linked_error_summary_for_all_invalid_fields(client, user):
     assert "清掃ルート：清掃ルートの形式が正しくありません。" in response.text
     assert 'aria-invalid="true"' in response.text
     assert "field-has-error" in response.text
-    assert "/static/js/activity-form-errors.js?v=20261016-5" in response.text
+    assert "/static/js/activity-form-errors.js?v=20261017-1" in response.text
     with database_proxy.connection_context():
         assert Activity.select().count() == 0
 
 
 def test_activity_form_error_script_is_served(client):
-    script = client.get("/static/js/activity-form-errors.js?v=20261016-5")
+    script = client.get("/static/js/activity-form-errors.js?v=20261017-1")
 
     assert script.status_code == 200
     assert script.mimetype == "text/javascript"

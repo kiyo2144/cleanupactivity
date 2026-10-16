@@ -75,6 +75,10 @@ def test_edit_page_prefills_activity_and_owner_link(client, user):
     assert f'/activities/{activity_id}/edit' in detail.text
     assert edit_page.status_code == 200
     assert 'value="フットパス北側"' in edit_page.text
+    assert 'value="30"' in edit_page.text
+    assert 'value="1"' in edit_page.text
+    assert edit_page.text.count('data-quantity-stepper') == 2
+    assert "/static/js/quantity-stepper.js?v=20261017-1" in edit_page.text
     assert "道路脇を清掃しました。" in edit_page.text
     parser = _InputParser()
     parser.feed(edit_page.text)

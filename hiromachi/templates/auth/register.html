@@ -50,7 +50,7 @@
         {{ form.password_confirm(autocomplete="new-password", maxlength="128") }}
         {% for error in form.password_confirm.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
       </div>
-      {{ form.submit(class_="button primary") }}
+      {{ form.submit(class_="button primary auth-submit") }}
     </form>
     <p><a href="{{ url_for('auth.login') }}">ログインはこちら</a></p>
   </section>

@@ -87,21 +87,51 @@
     <div id="route-errors">{% for error in form.route_points.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
   <div class="field{% if form.duration_minutes.errors %} field-has-error{% endif %}" id="field-duration-minutes" data-error-focus="duration_minutes">
-    {{ form.duration_minutes.label }}
-    {% if form.duration_minutes.errors %}
-      {{ form.duration_minutes(min="1", max="1440", aria_invalid="true", aria_describedby="duration-minutes-errors") }}
-    {% else %}
-      {{ form.duration_minutes(min="1", max="1440") }}
-    {% endif %}
+    {{ form.duration_minutes.label(id="duration-minutes-label") }}
+    <div
+      class="quantity-stepper"
+      role="group"
+      aria-labelledby="duration-minutes-label"
+      data-quantity-stepper
+      data-step="5"
+      data-min="1"
+      data-max="1440"
+      data-initial="5"
+      data-unit="分"
+    >
+      <button class="quantity-stepper-button quantity-stepper-decrease" type="button" data-quantity-decrease aria-label="所要時間を5分減らす" aria-controls="duration_minutes">−</button>
+      {% if form.duration_minutes.errors %}
+        {{ form.duration_minutes(min="1", max="1440", step="1", inputmode="numeric", aria_invalid="true", aria_describedby="duration-minutes-errors") }}
+      {% else %}
+        {{ form.duration_minutes(min="1", max="1440", step="1", inputmode="numeric") }}
+      {% endif %}
+      <button class="quantity-stepper-button quantity-stepper-increase" type="button" data-quantity-increase aria-label="所要時間を5分増やす" aria-controls="duration_minutes">＋</button>
+      <span class="visually-hidden" data-quantity-status aria-live="polite" aria-atomic="true"></span>
+    </div>
     <div id="duration-minutes-errors">{% for error in form.duration_minutes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
   <div class="field{% if form.bag_count.errors %} field-has-error{% endif %}" id="field-bag-count" data-error-focus="bag_count">
-    {{ form.bag_count.label }}
-    {% if form.bag_count.errors %}
-      {{ form.bag_count(min="0", max="99", aria_invalid="true", aria_describedby="bag-count-errors") }}
-    {% else %}
-      {{ form.bag_count(min="0", max="99") }}
-    {% endif %}
+    {{ form.bag_count.label(id="bag-count-label") }}
+    <div
+      class="quantity-stepper"
+      role="group"
+      aria-labelledby="bag-count-label"
+      data-quantity-stepper
+      data-step="1"
+      data-min="0"
+      data-max="99"
+      data-initial="1"
+      data-unit="袋"
+    >
+      <button class="quantity-stepper-button quantity-stepper-decrease" type="button" data-quantity-decrease aria-label="ゴミの袋数を1袋減らす" aria-controls="bag_count">−</button>
+      {% if form.bag_count.errors %}
+        {{ form.bag_count(min="0", max="99", step="1", inputmode="numeric", aria_invalid="true", aria_describedby="bag-count-errors") }}
+      {% else %}
+        {{ form.bag_count(min="0", max="99", step="1", inputmode="numeric") }}
+      {% endif %}
+      <button class="quantity-stepper-button quantity-stepper-increase" type="button" data-quantity-increase aria-label="ゴミの袋数を1袋増やす" aria-controls="bag_count">＋</button>
+      <span class="visually-hidden" data-quantity-status aria-live="polite" aria-atomic="true"></span>
+    </div>
     <div id="bag-count-errors">{% for error in form.bag_count.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
   <fieldset class="field checkbox-list{% if form.waste_types.errors %} field-has-error{% endif %}" id="field-waste-types" data-error-focus="waste_types-0" aria-invalid="{{ 'true' if form.waste_types.errors else 'false' }}" aria-describedby="waste-types-errors">

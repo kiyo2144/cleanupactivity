@@ -23,6 +23,17 @@ def test_auth_forms_use_user_facing_terms_and_required_marks(client):
     )
     assert login_page.status_code == 200
     assert "ログインID" in login_page.text
+    assert 'class="button primary auth-submit"' in login_page.text
+    assert 'class="button primary auth-submit"' in register_page.text
+
+
+def test_auth_submit_uses_brand_color_without_changing_other_buttons(client):
+    stylesheet = client.get("/static/css/style.css?v=20261017-1")
+
+    assert stylesheet.status_code == 200
+    assert "input.button.primary.auth-submit" in stylesheet.text
+    assert "background: var(--primary)" in stylesheet.text
+    assert "color: #fff" in stylesheet.text
 
 
 def test_register_hashes_password_and_redirects(client):

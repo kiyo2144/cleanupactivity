@@ -14,19 +14,19 @@ def test_pages_use_versioned_main_stylesheet(client):
     response = client.get("/login")
 
     assert response.status_code == 200
-    assert '/static/css/style.css?v=20261016-5' in response.text
+    assert '/static/css/style.css?v=20261017-1' in response.text
 
 
 def test_branding_and_ui_assets_are_served(client):
     login_page = client.get("/login")
-    full_logo = client.get("/static/images/brand/hiromachi-logo.png?v=20261016-5")
-    brand_mark = client.get("/static/images/brand/hiromachi-mark.png?v=20261016-5")
-    icon_sprite = client.get("/static/images/icons/ui.svg?v=20261016-5")
-    stylesheet = client.get("/static/css/style.css?v=20261016-5")
+    full_logo = client.get("/static/images/brand/hiromachi-logo.png?v=20261017-1")
+    brand_mark = client.get("/static/images/brand/hiromachi-mark.png?v=20261017-1")
+    icon_sprite = client.get("/static/images/icons/ui.svg?v=20261017-1")
+    stylesheet = client.get("/static/css/style.css?v=20261017-1")
 
     assert login_page.status_code == 200
-    assert "/static/images/brand/hiromachi-logo.png?v=20261016-5" in login_page.text
-    assert "/static/images/brand/hiromachi-mark.png?v=20261016-5" in login_page.text
+    assert "/static/images/brand/hiromachi-logo.png?v=20261017-1" in login_page.text
+    assert "/static/images/brand/hiromachi-mark.png?v=20261017-1" in login_page.text
     assert full_logo.status_code == 200
     assert full_logo.mimetype == "image/png"
     assert brand_mark.status_code == 200
@@ -40,6 +40,10 @@ def test_branding_and_ui_assets_are_served(client):
     assert "min-inline-size: 0" in stylesheet.text
     assert "width: 4.65rem" in stylesheet.text
     assert "width: 4rem" in stylesheet.text
+    assert ".quantity-stepper" in stylesheet.text
+    assert ".quantity-stepper.is-enhanced" in stylesheet.text
+    assert "display: grid" in stylesheet.text
+    assert "min-height: 2.75rem" in stylesheet.text
     assert "@media (prefers-reduced-motion: reduce)" in stylesheet.text
 
 

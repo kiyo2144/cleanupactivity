@@ -22,7 +22,7 @@
         {{ form.password(autocomplete="current-password", maxlength="128") }}
         {% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
       </div>
-      {{ form.submit(class_="button primary") }}
+      {{ form.submit(class_="button primary auth-submit") }}
     </form>
     <p><a href="{{ url_for('auth.register') }}">ユーザー登録はこちら</a></p>
   </section>
