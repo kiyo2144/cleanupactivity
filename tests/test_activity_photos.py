@@ -79,9 +79,9 @@ def test_create_page_includes_photo_preview(client, user):
     assert 'id="photo-preview-note"' in response.text
     assert "選択を取り消す" in response.text
     assert ".heic,.heif" in response.text
-    assert "/static/js/photo-preview.js?v=20261017-1" in response.text
+    assert "/static/js/photo-preview.js?v=20261017-2" in response.text
 
-    script = client.get("/static/js/photo-preview.js?v=20261017-1")
+    script = client.get("/static/js/photo-preview.js?v=20261017-2")
     assert script.status_code == 200
     assert "URL.createObjectURL" in script.text
     assert "URL.revokeObjectURL" in script.text

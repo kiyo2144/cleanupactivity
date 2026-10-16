@@ -28,6 +28,7 @@ body {
 
 body {
   min-width: 20rem;
+  touch-action: manipulation;
   margin: 0;
   background:
     radial-gradient(circle at 8% 8%, rgba(242, 199, 92, 0.24) 0 7rem, transparent 7.1rem),
