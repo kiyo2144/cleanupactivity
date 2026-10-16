@@ -8,6 +8,7 @@ from flask import (
     abort,
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -281,9 +282,21 @@ def toggle_thank(activity_id: int):
         if reaction is None:
             Reaction.create(user=current_user.id, activity=activity.id)
             message = "ありがとうを送りました。"
+            has_thanked = True
         else:
             reaction.delete_instance()
             message = "ありがとうを取り消しました。"
+            has_thanked = False
+
+    if request.accept_mimetypes.best == "application/json":
+        thank_count = Reaction.select().where(Reaction.activity == activity.id).count()
+        return jsonify(
+            {
+                "has_thanked": has_thanked,
+                "message": message,
+                "thank_count": thank_count,
+            }
+        )
 
     flash(message, "success-thanks")
     return redirect(

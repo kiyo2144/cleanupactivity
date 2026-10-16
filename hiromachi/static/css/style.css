@@ -107,8 +107,8 @@ a { -webkit-tap-highlight-color: transparent; }
 
 .brand-mark-image {
   display: block;
-  width: 3.1rem;
-  height: 2.35rem;
+  width: 4.65rem;
+  height: 3.55rem;
   object-fit: contain;
 }
 
@@ -269,6 +269,52 @@ h1 {
 h2 { font-size: clamp(1.3rem, 3vw, 1.65rem); }
 
 .field { margin-block: 1.4rem; }
+
+.form-error-summary {
+  min-width: 0;
+  margin: 1.5rem 0;
+  padding: 1rem 1.15rem;
+  border: 2px solid var(--danger);
+  border-radius: 0.9rem;
+  background: #fbe7e4;
+  color: #702b27;
+}
+
+.form-error-summary:focus {
+  outline: 3px solid rgba(166, 63, 56, 0.28);
+  outline-offset: 3px;
+}
+
+.form-error-summary h2 {
+  display: flex;
+  margin: 0 0 0.45rem;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.2rem;
+}
+
+.form-error-summary p { margin: 0.35rem 0; }
+.form-error-summary ul { margin: 0.55rem 0 0; padding-left: 1.4rem; }
+.form-error-summary li,
+.form-error-summary a {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.form-error-summary a { color: #702b27; }
+
+.field-has-error {
+  margin-inline: -0.75rem;
+  padding: 0.75rem;
+  border: 2px solid var(--danger);
+  border-radius: 0.9rem;
+  background: #fff1ef;
+  scroll-margin-block: 2rem;
+}
+
+.field-has-error input:not([type="checkbox"]),
+.field-has-error textarea,
+.field-has-error .route-map { border-color: var(--danger); }
 
 .field > label,
 .field > legend {
@@ -446,6 +492,28 @@ input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: var(--pr
 }
 .activity-thanks h2 .icon { color: #b78400; }
 
+.activity-thanks form { display: inline-block; }
+
+.activity-thanks.is-thank-sent .thank-count,
+.activity-thanks.is-thank-sent h2 > .icon,
+.activity-thanks.is-thank-sent [data-thank-button] {
+  animation: thank-feedback-pop 420ms ease-out both;
+}
+
+.activity-thanks.is-thank-removed .thank-count,
+.activity-thanks.is-thank-removed [data-thank-button] {
+  animation: thank-feedback-settle 260ms ease-out both;
+}
+
+.thank-status {
+  margin: 0.75rem 0 0;
+  color: var(--primary-dark);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.thank-status.is-error { color: var(--danger); }
+
 .required-note {
   margin-block: 0.75rem 1.25rem;
   color: var(--muted);
@@ -491,6 +559,11 @@ input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: var(--pr
 .button:active {
   transform: translate(3px, 3px);
   box-shadow: 1px 1px 0 var(--strong-border);
+}
+
+.button:disabled {
+  cursor: wait;
+  opacity: 0.68;
 }
 
 .primary { background: var(--primary); color: #fff; }
@@ -681,6 +754,16 @@ body[data-feedback="success-thanks"] .activity-thanks h2 > .icon {
   55% { transform: scale(1.35); color: var(--primary-dark); }
 }
 
+@keyframes thank-feedback-pop {
+  0%, 100% { transform: scale(1); }
+  55% { transform: scale(1.14); }
+}
+
+@keyframes thank-feedback-settle {
+  0%, 100% { transform: scale(1); }
+  55% { transform: scale(0.94); }
+}
+
 @keyframes photo-preview-in {
   0% { opacity: 0; transform: translateY(0.5rem) scale(0.99); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -729,7 +812,7 @@ body[data-feedback="success-thanks"] .activity-thanks h2 > .icon {
 
 @media (max-width: 36rem) {
   body { background: var(--background); font-size: 0.96rem; }
-  .brand-mark-image { width: 2.8rem; height: 2.1rem; }
+  .brand-mark-image { width: 4rem; height: 3.05rem; }
   .page-heading { min-height: 9rem; align-items: flex-start; flex-direction: column; }
   .page-heading::after { right: -4rem; bottom: -5rem; }
   .page-heading .button { align-self: stretch; }

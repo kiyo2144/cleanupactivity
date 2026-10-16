@@ -4,6 +4,7 @@
 {% block content %}
   <section class="panel form-panel">
     <h1>活動を編集</h1>
+    {% set error_summary_title = "更新できませんでした" %}
     {% set cancel_url = url_for('activities.detail', activity_id=activity.id) %}
     {% set allow_photo_removal = true %}
     {% include "activities/_form.html" %}
@@ -11,4 +12,5 @@
   <script src="{{ url_for('static', filename='js/photo-preview.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
   <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
   <script src="{{ url_for('static', filename='js/activity-route-map.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
+  <script src="{{ url_for('static', filename='js/activity-form-errors.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
 {% endblock %}

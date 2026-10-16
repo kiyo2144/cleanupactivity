@@ -158,6 +158,10 @@ def test_edit_validation_error_does_not_change_activity(client, user):
 
     assert response.status_code == 200
     assert "未来の日付は指定できません" in response.text
+    assert "更新できませんでした" in response.text
+    assert 'class="form-error-summary"' in response.text
+    assert 'href="#field-activity-date"' in response.text
+    assert 'aria-invalid="true"' in response.text
     with database_proxy.connection_context():
         assert Activity.get_by_id(activity_id).location == "フットパス北側"
 

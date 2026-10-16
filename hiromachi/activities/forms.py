@@ -34,27 +34,48 @@ class ActivityForm(FlaskForm):
     activity_date = DateField(
         "活動日",
         default=today_in_japan,
-        validators=[InputRequired()],
+        validators=[InputRequired(message="入力してください。")],
     )
     location = StringField(
         "活動場所",
-        validators=[InputRequired(), Length(min=1, max=100)],
+        validators=[
+            InputRequired(message="入力してください。"),
+            Length(min=1, max=100, message="100文字以内で入力してください。"),
+        ],
     )
-    route_points = HiddenField("清掃ルート", validators=[Optional(), Length(max=8192)])
+    route_points = HiddenField(
+        "清掃ルート",
+        validators=[
+            Optional(),
+            Length(max=8192, message="清掃ルートのデータが大きすぎます。"),
+        ],
+    )
     duration_minutes = IntegerField(
         "所要時間（分）",
-        validators=[InputRequired(), NumberRange(min=1, max=1440)],
+        validators=[
+            InputRequired(message="入力してください。"),
+            NumberRange(min=1, max=1440, message="1～1440の範囲で入力してください。"),
+        ],
     )
     bag_count = IntegerField(
         "ゴミの袋数",
-        validators=[InputRequired(), NumberRange(min=0, max=99)],
+        validators=[
+            InputRequired(message="入力してください。"),
+            NumberRange(min=0, max=99, message="0～99の範囲で入力してください。"),
+        ],
     )
     waste_types = MultiCheckboxField(
         "ゴミの種類",
         coerce=int,
         validators=[InputRequired(message="1つ以上選択してください。")],
     )
-    comment = TextAreaField("コメント・感想", validators=[Optional(), Length(max=500)])
+    comment = TextAreaField(
+        "コメント・感想",
+        validators=[
+            Optional(),
+            Length(max=500, message="500文字以内で入力してください。"),
+        ],
+    )
     photo = FileField("活動写真", validators=[Optional()])
     submit = SubmitField("記録する")
 
@@ -72,8 +93,8 @@ class ActivityForm(FlaskForm):
         except (TypeError, ValueError) as error:
             raise ValidationError("清掃ルートの形式が正しくありません。") from error
 
-        if not isinstance(raw_points, list) or not 2 <= len(raw_points) <= 100:
-            raise ValidationError("清掃ルートは2～100地点で指定してください。")
+        if not isinstance(raw_points, list) or not 1 <= len(raw_points) <= 100:
+            raise ValidationError("清掃ルートは1～100地点で指定してください。")
 
         points: list[list[float]] = []
         for raw_point in raw_points:
@@ -96,7 +117,7 @@ class ActivityForm(FlaskForm):
         # Do not retain precise start/end positions, which may reveal a home address.
         points[0] = [round(points[0][0], 3), round(points[0][1], 3)]
         points[-1] = [round(points[-1][0], 3), round(points[-1][1], 3)]
-        if len({tuple(point) for point in points}) < 2:
+        if len(points) >= 2 and len({tuple(point) for point in points}) < 2:
             raise ValidationError("清掃ルートには異なる地点を2つ以上指定してください。")
 
         field.data = json.dumps(points, ensure_ascii=True, separators=(",", ":"))

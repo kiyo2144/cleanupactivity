@@ -85,29 +85,34 @@
     line.setLatLngs(points);
     pointLayer.clearLayers();
     points.forEach((point, index) => {
-      if (index === 0 && mode === "edit") {
+      if (index === 0 && (mode === "edit" || points.length === 1)) {
+        const isEditable = mode === "edit";
         const marker = window.L.marker(point, {
-          alt: "清掃ルートの始点。ドラッグして位置を修正できます",
-          autoPan: true,
-          draggable: true,
+          alt: isEditable
+            ? "清掃ルートの始点。ドラッグして位置を修正できます"
+            : "登録された清掃地点",
+          autoPan: isEditable,
+          draggable: isEditable,
           icon: startIcon,
           keyboard: true,
-          title: "始点（ドラッグして修正）",
+          title: isEditable ? "始点（ドラッグして修正）" : "清掃地点",
         }).addTo(pointLayer);
         if (index === animatedPointIndex) {
           marker.getElement()?.querySelector("span")?.classList.add("route-point-added");
         }
-        marker.on("dragstart", clearAccuracy);
-        marker.on("dragend", (event) => {
-          const position = event.target.getLatLng();
-          points[0] = [
-            Number(position.lat.toFixed(6)),
-            Number(position.lng.toFixed(6)),
-          ];
-          clearAccuracy();
-          reportLocation("始点を手動で修正しました。");
-          update();
-        });
+        if (isEditable) {
+          marker.on("dragstart", clearAccuracy);
+          marker.on("dragend", (event) => {
+            const position = event.target.getLatLng();
+            points[0] = [
+              Number(position.lat.toFixed(6)),
+              Number(position.lng.toFixed(6)),
+            ];
+            clearAccuracy();
+            reportLocation("始点を手動で修正しました。");
+            update();
+          });
+        }
         return;
       }
       const pointMarker = window.L.circleMarker(point, {
@@ -125,9 +130,9 @@
     if (mode === "edit") {
       report(
         points.length === 0
-          ? "地図をタップして2地点以上を指定してください。"
+          ? "地図をタップして地点を指定してください。"
           : points.length === 1
-            ? "1地点を指定しています。地図をタップして次の地点を追加してください。始点はドラッグして修正できます。"
+            ? "1地点を指定しています。このまま投稿できます。さらに追加すると線でルートを記録できます。始点はドラッグして修正できます。"
             : `${points.length}地点を指定しています。始点はドラッグして修正できます。`,
       );
       updateLocationButton();

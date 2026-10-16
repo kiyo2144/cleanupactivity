@@ -70,15 +70,18 @@ def test_create_page_includes_photo_preview(client, user):
     assert response.status_code == 200
     assert 'id="photo-preview"' in response.text
     assert 'data-max-bytes="10485760"' in response.text
-    assert 'aria-describedby="photo-help photo-privacy photo-preview-note photo-preview-error"' in response.text
+    assert (
+        'aria-describedby="photo-help photo-privacy photo-preview-note '
+        'photo-preview-error photo-errors"' in response.text
+    )
     assert 'id="photo-preview-image"' in response.text
     assert 'id="photo-preview-remove"' in response.text
     assert 'id="photo-preview-note"' in response.text
     assert "選択を取り消す" in response.text
     assert ".heic,.heif" in response.text
-    assert "/static/js/photo-preview.js?v=20261016-2" in response.text
+    assert "/static/js/photo-preview.js?v=20261016-5" in response.text
 
-    script = client.get("/static/js/photo-preview.js?v=20261016-2")
+    script = client.get("/static/js/photo-preview.js?v=20261016-5")
     assert script.status_code == 200
     assert "URL.createObjectURL" in script.text
     assert "URL.revokeObjectURL" in script.text

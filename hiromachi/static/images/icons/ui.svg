@@ -40,4 +40,8 @@
   <symbol id="icon-location" viewBox="0 0 24 24">
     <path d="m12 21 8-17-17 8 7 2 2 7Z"/>
   </symbol>
+  <symbol id="icon-alert-triangle" viewBox="0 0 24 24">
+    <path d="M10.3 4.3 2.7 18a2 2 0 0 0 1.8 3h15a2 2 0 0 0 1.8-3L13.7 4.3a2 2 0 0 0-3.4 0Z"/>
+    <path d="M12 9v4M12 17h.01"/>
+  </symbol>
 </svg>

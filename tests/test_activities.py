@@ -62,6 +62,51 @@ def test_create_rejects_future_date(client, user):
         assert Activity.select().count() == 0
 
 
+def test_create_shows_linked_error_summary_for_all_invalid_fields(client, user):
+    login(client)
+
+    response = client.post(
+        "/activities/new",
+        data={
+            "activity_date": "",
+            "location": "",
+            "route_points": "not-json",
+            "duration_minutes": "",
+            "bag_count": "",
+            "waste_types": [],
+            "comment": "",
+        },
+    )
+
+    assert response.status_code == 200
+    assert "投稿できませんでした" in response.text
+    assert 'class="form-error-summary"' in response.text
+    assert 'role="alert"' in response.text
+    assert 'href="#field-activity-date"' in response.text
+    assert 'href="#field-location"' in response.text
+    assert 'href="#field-route-points"' in response.text
+    assert 'href="#field-duration-minutes"' in response.text
+    assert 'href="#field-bag-count"' in response.text
+    assert 'href="#field-waste-types"' in response.text
+    assert "活動日：入力してください。" in response.text
+    assert "清掃ルート：清掃ルートの形式が正しくありません。" in response.text
+    assert 'aria-invalid="true"' in response.text
+    assert "field-has-error" in response.text
+    assert "/static/js/activity-form-errors.js?v=20261016-5" in response.text
+    with database_proxy.connection_context():
+        assert Activity.select().count() == 0
+
+
+def test_activity_form_error_script_is_served(client):
+    script = client.get("/static/js/activity-form-errors.js?v=20261016-5")
+
+    assert script.status_code == 200
+    assert script.mimetype == "text/javascript"
+    assert "summary.focus({ preventScroll: true })" in script.text
+    assert "field.scrollIntoView" in script.text
+    assert "focusTarget?.focus" in script.text
+
+
 def test_activity_list_is_paginated(client, user):
     with database_proxy.atomic():
         for number in range(11):

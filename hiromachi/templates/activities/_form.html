@@ -1,22 +1,65 @@
 {% from "components/_icon.html" import icon %}
-<form method="post" enctype="multipart/form-data" novalidate>
+{% set error_targets = {
+  "activity_date": "field-activity-date",
+  "location": "field-location",
+  "route_points": "field-route-points",
+  "duration_minutes": "field-duration-minutes",
+  "bag_count": "field-bag-count",
+  "waste_types": "field-waste-types",
+  "comment": "field-comment",
+  "photo": "field-photo"
+} %}
+{% if form.errors %}
+  <section
+    class="form-error-summary"
+    id="activity-form-errors"
+    role="alert"
+    aria-labelledby="activity-form-errors-heading"
+    tabindex="-1"
+    data-form-error-summary
+  >
+    <h2 id="activity-form-errors-heading">{{ icon('alert-triangle') }}<span>{{ error_summary_title }}</span></h2>
+    <p>次の内容を確認してください。</p>
+    <ul>
+      {% for field_name, errors in form.errors.items() %}
+        {% set error_field = form[field_name] %}
+        {% for error in errors %}
+          <li>
+            <a href="#{{ error_targets.get(field_name, 'activity-form') }}" data-error-link>
+              {{ error_field.label.text }}：{{ error }}
+            </a>
+          </li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+<form id="activity-form" method="post" enctype="multipart/form-data" novalidate>
   {{ form.hidden_tag("csrf_token") }}
-  <div class="field">
+  <div class="field{% if form.activity_date.errors %} field-has-error{% endif %}" id="field-activity-date" data-error-focus="activity_date">
     {{ form.activity_date.label }}
-    {{ form.activity_date() }}
-    {% for error in form.activity_date.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% if form.activity_date.errors %}
+      {{ form.activity_date(aria_invalid="true", aria_describedby="activity-date-errors") }}
+    {% else %}
+      {{ form.activity_date() }}
+    {% endif %}
+    <div id="activity-date-errors">{% for error in form.activity_date.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
-  <div class="field">
+  <div class="field{% if form.location.errors %} field-has-error{% endif %}" id="field-location" data-error-focus="location">
     {{ form.location.label }}
-    {{ form.location(maxlength="100", placeholder="例：フットパス北側の小道") }}
-    <p class="hint">自宅の番地など、詳しすぎる場所は入力しないでください。</p>
-    {% for error in form.location.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% if form.location.errors %}
+      {{ form.location(maxlength="100", placeholder="例：フットパス北側の小道", aria_invalid="true", aria_describedby="location-privacy location-errors") }}
+    {% else %}
+      {{ form.location(maxlength="100", placeholder="例：フットパス北側の小道", aria_describedby="location-privacy") }}
+    {% endif %}
+    <p class="hint" id="location-privacy">自宅の番地など、詳しすぎる場所は入力しないでください。</p>
+    <div id="location-errors">{% for error in form.location.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
-  <div class="field route-field">
+  <div class="field route-field{% if form.route_points.errors %} field-has-error{% endif %}" id="field-route-points" data-error-focus="activity-route-map">
     {{ form.route_points.label }}
     {{ form.route_points(id="route-points") }}
-    <p class="hint" id="route-help">任意。地図を順番にタップして、清掃した道を線で記録します。</p>
-    <p class="hint">自宅などを推測されにくくするため、保存時に始点と終点を約100m単位に丸めます。</p>
+    <p class="hint" id="route-help">任意。1地点だけでも保存できます。2地点以上を指定すると、清掃した道を線で記録します。</p>
+    <p class="hint">自宅などを推測されにくくするため、保存時に1地点の場合はその地点を、2地点以上の場合は始点と終点を約100m単位に丸めます。</p>
     <button
       class="button secondary route-location-button"
       id="route-current-location"
@@ -31,37 +74,51 @@
       id="activity-route-map"
       data-route-mode="edit"
       aria-label="清掃ルート入力地図"
-      aria-describedby="route-help route-status route-location-status"
+      aria-describedby="route-help route-status route-location-status route-errors"
+      aria-invalid="{{ 'true' if form.route_points.errors else 'false' }}"
+      tabindex="0"
     ></div>
     <div class="route-actions">
       <button class="button secondary" id="route-undo" type="button">1地点戻す</button>
       <button class="button secondary" id="route-clear" type="button">ルートをクリア</button>
     </div>
-    <p class="hint" id="route-status" role="status" aria-live="polite">地図をタップして2地点以上を指定してください。</p>
+    <p class="hint" id="route-status" role="status" aria-live="polite">地図をタップして地点を指定してください。</p>
     <noscript><p class="hint">ルート入力にはJavaScriptが必要です。ルートなしでも活動を記録できます。</p></noscript>
-    {% for error in form.route_points.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    <div id="route-errors">{% for error in form.route_points.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
-  <div class="field">
+  <div class="field{% if form.duration_minutes.errors %} field-has-error{% endif %}" id="field-duration-minutes" data-error-focus="duration_minutes">
     {{ form.duration_minutes.label }}
-    {{ form.duration_minutes(min="1", max="1440") }}
-    {% for error in form.duration_minutes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% if form.duration_minutes.errors %}
+      {{ form.duration_minutes(min="1", max="1440", aria_invalid="true", aria_describedby="duration-minutes-errors") }}
+    {% else %}
+      {{ form.duration_minutes(min="1", max="1440") }}
+    {% endif %}
+    <div id="duration-minutes-errors">{% for error in form.duration_minutes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
-  <div class="field">
+  <div class="field{% if form.bag_count.errors %} field-has-error{% endif %}" id="field-bag-count" data-error-focus="bag_count">
     {{ form.bag_count.label }}
-    {{ form.bag_count(min="0", max="99") }}
-    {% for error in form.bag_count.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% if form.bag_count.errors %}
+      {{ form.bag_count(min="0", max="99", aria_invalid="true", aria_describedby="bag-count-errors") }}
+    {% else %}
+      {{ form.bag_count(min="0", max="99") }}
+    {% endif %}
+    <div id="bag-count-errors">{% for error in form.bag_count.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
-  <fieldset class="field checkbox-list">
+  <fieldset class="field checkbox-list{% if form.waste_types.errors %} field-has-error{% endif %}" id="field-waste-types" data-error-focus="waste_types-0" aria-invalid="{{ 'true' if form.waste_types.errors else 'false' }}" aria-describedby="waste-types-errors">
     <legend>{{ form.waste_types.label.text }}</legend>
     {% for option in form.waste_types %}
       <label>{{ option() }} {{ option.label.text }}</label>
     {% endfor %}
-    {% for error in form.waste_types.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    <div id="waste-types-errors">{% for error in form.waste_types.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </fieldset>
-  <div class="field">
+  <div class="field{% if form.comment.errors %} field-has-error{% endif %}" id="field-comment" data-error-focus="comment">
     {{ form.comment.label }}
-    {{ form.comment(maxlength="500", rows="5") }}
-    {% for error in form.comment.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% if form.comment.errors %}
+      {{ form.comment(maxlength="500", rows="5", aria_invalid="true", aria_describedby="comment-errors") }}
+    {% else %}
+      {{ form.comment(maxlength="500", rows="5") }}
+    {% endif %}
+    <div id="comment-errors">{% for error in form.comment.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
   {% if allow_photo_removal and photo %}
     <div class="field">
@@ -77,11 +134,12 @@
       <label>{{ form.remove_photo() }} {{ form.remove_photo.label.text }}</label>
     </div>
   {% endif %}
-  <div class="field">
+  <div class="field{% if form.photo.errors %} field-has-error{% endif %}" id="field-photo" data-error-focus="photo">
     {{ form.photo.label }}
     {{ form.photo(
       accept=".jpg,.jpeg,.png,.webp,.heic,.heif,image/jpeg,image/png,image/webp,image/heic,image/heif,image/heic-sequence,image/heif-sequence",
-      aria_describedby="photo-help photo-privacy photo-preview-note photo-preview-error"
+      aria_describedby="photo-help photo-privacy photo-preview-note photo-preview-error photo-errors",
+      aria_invalid="true" if form.photo.errors else "false"
     ) }}
     <p class="hint" id="photo-help">任意。JPEG、PNG、WebP、HEIC、HEIFのいずれか1枚、10MB以内。</p>
     <p class="hint" id="photo-privacy">人物や自宅など、公開したくない情報が写っていないか確認してください。</p>
@@ -100,7 +158,7 @@
     <p class="hint" id="photo-preview-note" role="status" aria-live="polite" hidden></p>
     <p class="field-error" id="photo-preview-error" role="alert" aria-live="polite" hidden></p>
     <noscript><p class="hint">プレビューにはJavaScriptが必要ですが、写真の投稿はそのまま行えます。</p></noscript>
-    {% for error in form.photo.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    <div id="photo-errors">{% for error in form.photo.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
   </div>
   <div class="actions">
     <button class="button primary" id="{{ form.submit.id }}" name="{{ form.submit.name }}" type="submit" value="{{ form.submit.label.text }}">

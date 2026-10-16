@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import date
 
 import pytest
+from peewee import IntegrityError
 from werkzeug.security import generate_password_hash
 
 from hiromachi.database import database_proxy
@@ -18,6 +20,7 @@ ROUTE_POINTS = [
     [35.234567, 139.234567],
     [35.345678, 139.345678],
 ]
+SINGLE_ROUTE_POINT = [[35.123456, 139.123456]]
 
 
 def _create_with_route(client) -> int:
@@ -43,9 +46,11 @@ def test_create_page_has_optional_route_map(client, user):
     assert location_button is not None
     assert "hidden" not in location_button.group(0)
     assert 'id="route-location-status"' in response.text
-    assert "/static/vendor/leaflet/leaflet.css?v=20261016-2" in response.text
-    assert "/static/vendor/leaflet/leaflet.js?v=20261016-2" in response.text
-    assert "/static/js/activity-route-map.js?v=20261016-2" in response.text
+    assert "/static/vendor/leaflet/leaflet.css?v=20261016-5" in response.text
+    assert "/static/vendor/leaflet/leaflet.js?v=20261016-5" in response.text
+    assert "/static/js/activity-route-map.js?v=20261016-5" in response.text
+    assert "/static/js/activity-form-errors.js?v=20261016-5" in response.text
+    assert "data-form-error-summary" not in response.text
 
 
 def test_create_without_route_remains_supported(client, user):
@@ -57,6 +62,26 @@ def test_create_without_route_remains_supported(client, user):
     with database_proxy.connection_context():
         assert Activity.select().count() == 1
         assert ActivityRoute.select().count() == 0
+
+
+def test_create_single_point_rounds_and_shows_marker(client, user):
+    login(client)
+
+    response = client.post(
+        "/activities/new",
+        data=activity_data(route_points=json.dumps(SINGLE_ROUTE_POINT)),
+    )
+
+    assert response.status_code == 303
+    with database_proxy.connection_context():
+        route = ActivityRoute.get()
+        assert route.point_count == 1
+        assert json.loads(route.points_json) == [[35.123, 139.123]]
+
+    detail = client.get(response.headers["Location"])
+    assert detail.status_code == 200
+    assert "清掃地点" in detail.text
+    assert 'aria-label="登録された清掃地点の地図"' in detail.text
 
 
 def test_create_route_rounds_endpoints_and_shows_logged_in_users(client, user):
@@ -85,17 +110,16 @@ def test_create_route_rounds_endpoints_and_shows_logged_in_users(client, user):
     assert detail.status_code == 200
     assert "清掃ルート" in detail.text
     assert 'data-route-mode="view"' in detail.text
-    assert "/static/js/activity-route-map.js?v=20261016-2" in detail.text
+    assert "/static/js/activity-route-map.js?v=20261016-5" in detail.text
 
 
 @pytest.mark.parametrize(
     ("route_points", "message"),
     [
         ("not-json", "清掃ルートの形式が正しくありません"),
-        (json.dumps([[35.0, 139.0]]), "清掃ルートは2～100地点"),
         (
             json.dumps([[35.0, 139.0 + (index * 0.001)] for index in range(101)]),
-            "清掃ルートは2～100地点",
+            "清掃ルートは1～100地点",
         ),
         (
             json.dumps([[91.0, 139.0], [35.0, 139.0]]),
@@ -117,6 +141,10 @@ def test_create_rejects_invalid_route(client, user, route_points, message):
 
     assert response.status_code == 200
     assert message in response.text
+    assert "投稿できませんでした" in response.text
+    assert 'href="#field-route-points"' in response.text
+    assert 'id="field-route-points"' in response.text
+    assert 'aria-invalid="true"' in response.text
     with database_proxy.connection_context():
         assert Activity.select().count() == 0
         assert ActivityRoute.select().count() == 0
@@ -157,6 +185,22 @@ def test_edit_prefills_updates_and_clears_route(client, user):
         assert ActivityRoute.select().count() == 0
 
 
+def test_edit_can_change_route_to_single_point(client, user):
+    login(client)
+    activity_id = _create_with_route(client)
+
+    response = client.post(
+        f"/activities/{activity_id}/edit",
+        data=activity_data(route_points=json.dumps(SINGLE_ROUTE_POINT)),
+    )
+
+    assert response.status_code == 303
+    with database_proxy.connection_context():
+        route = ActivityRoute.get()
+        assert route.point_count == 1
+        assert json.loads(route.points_json) == [[35.123, 139.123]]
+
+
 def test_route_database_failure_rolls_back_activity(client, user, monkeypatch):
     login(client)
 
@@ -189,20 +233,42 @@ def test_delete_activity_cascades_to_route(client, user):
 
 
 def test_map_static_files_are_served(client):
-    script = client.get("/static/js/activity-route-map.js?v=20261016-2")
+    script = client.get("/static/js/activity-route-map.js?v=20261016-5")
     assert script.status_code == 200
     assert "navigator.geolocation.getCurrentPosition" in script.text
     assert "enableHighAccuracy: true" in script.text
     assert "timeout: 10000" in script.text
     assert "maximumAge: 0" in script.text
-    assert "draggable: true" in script.text
+    assert "draggable: isEditable" in script.text
     assert 'classList.add("route-point-added")' in script.text
+    assert "points.length === 1" in script.text
+    assert 'title: isEditable ? "始点（ドラッグして修正）" : "清掃地点"' in script.text
+    assert "このまま投稿できます" in script.text
     assert "現在地の利用が許可されませんでした" in script.text
     assert (
-        client.get("/static/vendor/leaflet/leaflet.css?v=20261016-2").status_code
+        client.get("/static/vendor/leaflet/leaflet.css?v=20261016-5").status_code
         == 200
     )
     assert (
-        client.get("/static/vendor/leaflet/leaflet.js?v=20261016-2").status_code
+        client.get("/static/vendor/leaflet/leaflet.js?v=20261016-5").status_code
         == 200
     )
+
+
+@pytest.mark.parametrize("point_count", [0, 101])
+def test_route_database_rejects_out_of_range_point_count(user, point_count):
+    with database_proxy.connection_context():
+        activity = Activity.create(
+            user=user,
+            activity_date=date.today(),
+            location="DB制約確認",
+            duration_minutes=10,
+            bag_count=0,
+        )
+        with pytest.raises(IntegrityError):
+            with database_proxy.atomic():
+                ActivityRoute.create(
+                    activity=activity,
+                    points_json="[[35.0,139.0]]",
+                    point_count=point_count,
+                )

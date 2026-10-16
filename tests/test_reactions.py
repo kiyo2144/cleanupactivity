@@ -73,6 +73,56 @@ def test_thank_can_be_sent_and_cancelled(client, user):
         assert Reaction.select().count() == 0
 
 
+def test_thank_json_updates_in_place_without_flash(client, user):
+    activity = _create_activity(user)
+    actor = _create_user("json_actor", "画面内で応援する人")
+    login(client, username=actor.username)
+    client.get("/activities")  # Consume the login success flash.
+
+    detail = client.get(f"/activities/{activity.id}")
+    sent = client.post(
+        f"/activities/{activity.id}/thanks",
+        headers={"Accept": "application/json"},
+    )
+
+    assert 'data-thank-form' in detail.text
+    assert 'aria-pressed="false"' in detail.text
+    assert "/static/js/activity-thanks.js?v=20261016-5" in detail.text
+    assert sent.status_code == 200
+    assert sent.json == {
+        "has_thanked": True,
+        "message": "ありがとうを送りました。",
+        "thank_count": 1,
+    }
+
+    refreshed = client.get(f"/activities/{activity.id}")
+    assert 'aria-pressed="true"' in refreshed.text
+    assert 'class="flash flash-success-thanks"' not in refreshed.text
+
+    cancelled = client.post(
+        f"/activities/{activity.id}/thanks",
+        headers={"Accept": "application/json"},
+    )
+    assert cancelled.status_code == 200
+    assert cancelled.json == {
+        "has_thanked": False,
+        "message": "ありがとうを取り消しました。",
+        "thank_count": 0,
+    }
+    with database_proxy.connection_context():
+        assert Reaction.select().count() == 0
+
+
+def test_thank_in_place_script_is_served(client):
+    script = client.get("/static/js/activity-thanks.js?v=20261016-5")
+
+    assert script.status_code == 200
+    assert script.mimetype == "text/javascript"
+    assert 'headers: { Accept: "application/json" }' in script.text
+    assert 'button.disabled = true' in script.text
+    assert 'window.location.assign(response.url)' in script.text
+
+
 def test_detail_shows_count_without_actor_names(client, user):
     activity = _create_activity(user)
     first_actor = _create_user("first_actor", "一人目の応援者")

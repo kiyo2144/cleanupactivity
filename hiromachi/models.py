@@ -154,7 +154,7 @@ class ActivityRoute(BaseModel):
     points_json = TextField(
         constraints=[Check("length(points_json) BETWEEN 5 AND 8192")]
     )
-    point_count = IntegerField(constraints=[Check("point_count BETWEEN 2 AND 100")])
+    point_count = IntegerField(constraints=[Check("point_count BETWEEN 1 AND 100")])
     created_at = DateTimeField(default=utc_now)
     updated_at = DateTimeField(default=utc_now)
 

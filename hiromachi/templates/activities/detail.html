@@ -17,14 +17,14 @@
     {% endif %}
     {% if route_points %}
       <section class="activity-route" aria-labelledby="activity-route-heading">
-        <h2 id="activity-route-heading">清掃ルート</h2>
-        <p class="hint">プライバシー保護のため、始点と終点は約100m単位に丸めて表示しています。</p>
+        <h2 id="activity-route-heading">{% if route_points|length == 1 %}清掃地点{% else %}清掃ルート{% endif %}</h2>
+        <p class="hint">プライバシー保護のため、{% if route_points|length == 1 %}地点{% else %}始点と終点{% endif %}は約100m単位に丸めて表示しています。</p>
         <div
           class="route-map"
           id="activity-route-map"
           data-route-mode="view"
           data-route-points='{{ route_points|tojson }}'
-          aria-label="登録された清掃ルートの地図"
+          aria-label="登録された{% if route_points|length == 1 %}清掃地点{% else %}清掃ルート{% endif %}の地図"
         ></div>
       </section>
     {% endif %}
@@ -43,12 +43,17 @@
         {{ icon('sparkles') }}<span>ありがとう <strong class="thank-count">{{ thank_count }}</strong>件</span>
       </h2>
       {% if activity.user_id != current_user.id %}
-        <form method="post" action="{{ url_for('activities.toggle_thank', activity_id=activity.id) }}">
+        <form
+          method="post"
+          action="{{ url_for('activities.toggle_thank', activity_id=activity.id) }}"
+          data-thank-form
+        >
           {{ thank_form.hidden_tag() }}
-          <button class="button secondary" type="submit">
+          <button class="button secondary" type="submit" aria-pressed="{{ 'true' if has_thanked else 'false' }}" data-thank-button>
             {{ icon('sparkles') }}
-            {% if has_thanked %}ありがとうを取り消す{% else %}ありがとうを送る{% endif %}
+            <span data-thank-button-label>{% if has_thanked %}ありがとうを取り消す{% else %}ありがとうを送る{% endif %}</span>
           </button>
+          <p class="thank-status" role="status" aria-live="polite" data-thank-status hidden></p>
         </form>
       {% endif %}
     </section>
@@ -62,5 +67,8 @@
   {% if route_points %}
     <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
     <script src="{{ url_for('static', filename='js/activity-route-map.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
+  {% endif %}
+  {% if activity.user_id != current_user.id %}
+    <script src="{{ url_for('static', filename='js/activity-thanks.js', v=config['STATIC_ASSET_VERSION']) }}" defer></script>
   {% endif %}
 {% endblock %}
