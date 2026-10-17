@@ -1,6 +1,7 @@
 """Activity list, creation, and detail routes."""
 
 import json
+from datetime import date
 from math import ceil
 from pathlib import Path
 
@@ -30,10 +31,25 @@ from ..models import (
     utc_now,
 )
 from . import blueprint
-from .forms import ActivityDeleteForm, ActivityEditForm, ActivityForm, ThankForm
+from .forms import (
+    ActivityDeleteForm,
+    ActivityEditForm,
+    ActivityForm,
+    ThankForm,
+    today_in_japan,
+)
 from .images import PhotoValidationError, process_photo, store_photo
 
 PAGE_SIZE = 10
+
+
+def _current_month() -> tuple[date, date, str]:
+    """Use the same Japan-calendar month for community totals and rankings."""
+    start = today_in_japan().replace(day=1)
+    end = start.replace(
+        year=start.year + (start.month == 12), month=start.month % 12 + 1
+    )
+    return start, end, f"{start.year}年{start.month}月"
 
 
 def _page_number(total_items: int) -> tuple[int, int]:
@@ -162,7 +178,8 @@ def _remove_deleted_photo(path: Path | None, activity_id: int) -> None:
 @blueprint.get("/activities")
 @login_required
 def index():
-    totals = (
+    month_start, next_month, month_label = _current_month()
+    totals_query = (
         Activity.select(
             fn.COUNT(Activity.id).alias("activity_count"),
             fn.COALESCE(fn.SUM(Activity.duration_minutes), 0).alias(
@@ -171,8 +188,11 @@ def index():
             fn.COALESCE(fn.SUM(Activity.bag_count), 0).alias("total_bags"),
         )
         .dicts()
-        .get()
     )
+    totals = totals_query.get()
+    monthly_totals = totals_query.where(
+        Activity.activity_date >= month_start, Activity.activity_date < next_month
+    ).get()
     query = (
         Activity.select(Activity, User)
         .join(User)
@@ -182,10 +202,48 @@ def index():
     return render_template(
         "activities/index.html",
         totals=totals,
+        monthly_totals=monthly_totals,
+        month_label=month_label,
         activities=activities,
         route_previews=_activity_route_previews(activities),
         page=page,
         total_pages=total_pages,
+    )
+
+
+@blueprint.get("/activities/ranking")
+@login_required
+def ranking() -> str:
+    """Show this month's competition ranks, including every tie at tenth place."""
+    month_start, next_month, month_label = _current_month()
+    total_minutes = fn.SUM(Activity.duration_minutes)
+    query = (
+        Activity.select(
+            User.id.alias("user_id"),
+            User.display_name,
+            total_minutes.alias("total_minutes"),
+        )
+        .join(User)
+        .where(
+            Activity.activity_date >= month_start,
+            Activity.activity_date < next_month,
+        )
+        .group_by(User.id, User.display_name)
+        .order_by(total_minutes.desc(), User.id.asc())
+        .dicts()
+    )
+    entries = []
+    previous_minutes = None
+    rank = 0
+    for position, row in enumerate(query, start=1):
+        if row["total_minutes"] != previous_minutes:
+            rank = position
+        if rank > 10:
+            break
+        entries.append({**row, "rank": rank})
+        previous_minutes = row["total_minutes"]
+    return render_template(
+        "activities/ranking.html", entries=entries, month_label=month_label
     )
 
 

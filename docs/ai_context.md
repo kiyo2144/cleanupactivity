@@ -1,5 +1,11 @@
 # ひろまち AI開発コンテキスト
 
+## 今月の成果・ランキング追加
+
+- `/activities`は地域の今月成果、既存全期間成果、一覧を順に表示する。日本時間の活動日で回数・時間・袋数を都度集計し、ページ番号に依存しない。
+- `activities.ranking`（GET `/activities/ranking`）はログイン必須で、利用者ごとの合計清掃時間順の10位以内全員を既存表示名で表示する。同順位は1・1・3方式、同順位内は内部ID順。ユーザーID非表示。
+- 月選択・基準切替・袋の大きさ・掲載同意は未実装（後3項目は将来検討）。DB変更・新規依存はない。本番反映は今回行わない。
+
 ## 1. この文書の目的
 
 この文書は、AIが「ひろまち」の目的、固定技術、現在の実装状態を短時間で把握するための要約です。詳細仕様は各設計書を参照し、未確認の機能を推測で追加しないでください。
@@ -72,6 +78,7 @@ Blueprintは`main`、`auth`、`activities`、`users`に分かれています。
 | `auth.login` | GET, POST | `/login` | ログイン |
 | `auth.logout` | POST | `/logout` | ログアウト |
 | `activities.index` | GET | `/activities` | 全利用者の活動一覧 |
+| `activities.ranking` | GET | `/activities/ranking` | 今月の清掃時間ランキング |
 | `activities.create` | GET, POST | `/activities/new` | 活動記録の作成 |
 | `activities.detail` | GET | `/activities/<int:activity_id>` | 活動詳細 |
 | `activities.edit` | GET, POST | `/activities/<int:activity_id>/edit` | 本人限定の活動編集 |
@@ -80,7 +87,7 @@ Blueprintは`main`、`auth`、`activities`、`users`に分かれています。
 | `activities.toggle_thank` | POST | `/activities/<int:activity_id>/thanks` | 他人の活動への「ありがとう」の送信・取消 |
 | `users.me` | GET | `/me` | 自分の活動と集計 |
 
-Flaskのルート表には、上記12ルートに静的ファイル用の`static`を加えた13ルートがあります。
+Flaskのルート表には、上記13ルートに静的ファイル用の`static`を加えた14ルートがあります。
 
 ## 6. 初版のデータ
 
@@ -181,7 +188,7 @@ pytest --cov=hiromachi --cov-report=term-missing
 - 複数写真、動画、一覧・マイページのサムネイル
 - メールアドレス、メール認証、パスワード再設定
 - GPSによる連続・バックグラウンド記録、住所検索、複数ルート
-- ランキング、バッジ、連続記録
+- 今月の清掃時間ランキング以外のランキング、バッジ、連続記録
 - コメント、フォロー、「ありがとう」以外のリアクション
 - 清掃イベント、通知
 - 外部ストレージ、管理者画面、JSON API

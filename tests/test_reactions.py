@@ -87,7 +87,7 @@ def test_thank_json_updates_in_place_without_flash(client, user):
 
     assert 'data-thank-form' in detail.text
     assert 'aria-pressed="false"' in detail.text
-    assert "/static/js/activity-thanks.js?v=20261017-3" in detail.text
+    assert "/static/js/activity-thanks.js?v=20261017-4" in detail.text
     assert sent.status_code == 200
     assert sent.json == {
         "has_thanked": True,
@@ -114,7 +114,7 @@ def test_thank_json_updates_in_place_without_flash(client, user):
 
 
 def test_thank_in_place_script_is_served(client):
-    script = client.get("/static/js/activity-thanks.js?v=20261017-3")
+    script = client.get("/static/js/activity-thanks.js?v=20261017-4")
 
     assert script.status_code == 200
     assert script.mimetype == "text/javascript"

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}今月の清掃時間ランキング | ひろまち{% endblock %}
+{% block content %}
+  <h1>今月の清掃時間ランキング</h1>
+  <p>{{ month_label }}</p>
+  <p>今月の活動日の記録から、合計清掃時間で集計しています。10位以内を表示し、同じ時間は同順位とします。</p>
+  {% if entries %}
+    <ol class="ranking-list" role="list" aria-label="今月の清掃時間ランキング">
+      {% for entry in entries %}
+        <li value="{{ entry.rank }}" class="ranking-entry">
+          <span class="ranking-position">{{ entry.rank }}位</span>
+          <span class="ranking-name">{{ entry.display_name }}さん</span>
+          <strong class="ranking-time">{{ entry.total_minutes }}分</strong>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p>今月の活動記録はまだありません。</p>
+  {% endif %}
+  <p><a href="{{ url_for('activities.index') }}">みんなの活動へ戻る</a></p>
+{% endblock %}

@@ -28,7 +28,7 @@ def test_auth_forms_use_user_facing_terms_and_required_marks(client):
 
 
 def test_auth_submit_uses_brand_color_without_changing_other_buttons(client):
-    stylesheet = client.get("/static/css/style.css?v=20261017-3")
+    stylesheet = client.get("/static/css/style.css?v=20261017-4")
 
     assert stylesheet.status_code == 200
     assert "input.button.primary.auth-submit" in stylesheet.text

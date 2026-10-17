@@ -10,7 +10,19 @@
     <a class="button primary" href="{{ url_for('activities.create') }}">{{ icon('plus') }}<span>新しく記録する</span></a>
   </div>
 
-  <h2>まちのみんなの成果</h2>
+  <section aria-labelledby="monthly-community-heading">
+    <h2 id="monthly-community-heading">まちのみんなの今月の成果</h2>
+    <p>{{ month_label }}</p>
+    <div class="summary" aria-label="地域全体の今月の活動集計">
+      <div data-metric="monthly-activity-count"><strong>{{ monthly_totals.activity_count }}</strong><span>活動回数</span></div>
+      <div data-metric="monthly-total-minutes"><strong>{{ monthly_totals.total_minutes }}</strong><span>合計時間（分）</span></div>
+      <div data-metric="monthly-total-bags"><strong>{{ monthly_totals.total_bags }}</strong><span>合計袋数</span></div>
+    </div>
+    {% if not monthly_totals.activity_count %}<p>今月の活動記録はまだありません。</p>{% endif %}
+    <p><a href="{{ url_for('activities.ranking') }}">今月の清掃時間ランキングを見る</a></p>
+  </section>
+
+  <h2>まちのみんなの成果（全期間）</h2>
   <section class="summary" aria-label="地域全体の活動集計">
     <div data-metric="activity-count"><strong>{{ totals.activity_count }}</strong><span>活動回数</span></div>
     <div data-metric="total-minutes"><strong>{{ totals.total_minutes }}</strong><span>累計時間（分）</span></div>

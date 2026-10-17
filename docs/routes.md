@@ -1,5 +1,11 @@
 # ひろまち ルーティング設計書
 
+## 追加ルート：今月の清掃時間ランキング
+
+- `GET /activities/ranking`、`activities.ranking`、ログイン必須、`activities/ranking.html`。POSTは405。未ログインは既存のログイン導線へリダイレクトする。
+- サーバーの日本時間で当月範囲を決定し、活動日で絞り、usersと結合して利用者別にSUMを一括取得する。時間降順・内部ID昇順で安定表示し、競技順位の10位以内（同順位全員）を出す。0件は空表示とする。
+- `GET /activities`には同じ当月範囲の地域集計と対象年月を追加する。従来の全期間集計・並び順・1ページ10件は維持し、新しい入力パラメーターやJSON APIは設けない。
+
 ## 1. この文書について
 
 この文書は、「ひろまち」初版（MVP）のFlaskルート、HTTPメソッド、認証、正常時とエラー時の処理を定めるものです。画面の表示内容は`docs/screens.md`、機能要件は`docs/requirements.md`を基準とします。
@@ -24,6 +30,7 @@
 | `/login` | GET, POST | `auth.login` | 不要 | `auth/login.html` | ログインフォームの表示と認証 |
 | `/logout` | POST | `auth.logout` | 必要 | なし | ログアウト |
 | `/activities` | GET | `activities.index` | 必要 | `activities/index.html` | 全利用者の活動一覧 |
+| `/activities/ranking` | GET | `activities.ranking` | 必要 | `activities/ranking.html` | 今月の清掃時間ランキング |
 | `/activities/new` | GET, POST | `activities.create` | 必要 | `activities/create.html` | 活動記録フォームの表示と登録 |
 | `/activities/<int:activity_id>` | GET | `activities.detail` | 必要 | `activities/detail.html` | 活動詳細 |
 | `/activities/<int:activity_id>/edit` | GET, POST | `activities.edit` | 必要・本人限定 | `activities/edit.html` | 活動編集フォームの表示と更新 |
@@ -492,6 +499,6 @@
 
 - 削除した活動の復元、論理削除、一定期間の削除保留
 - ユーザープロフィールの編集
-- ランキング、コメント、フォロー、「ありがとう」以外のリアクション
+- 今月の清掃時間ランキング以外のランキング、コメント、フォロー、「ありがとう」以外のリアクション
 - メール認証、パスワード再設定
 - JSON API

@@ -950,3 +950,23 @@ body[data-feedback="success-thanks"] .activity-thanks h2 > .icon {
     transition-duration: 0.01ms !important;
   }
 }
+
+.ranking-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1rem;
+}
+
+.ranking-entry {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: .5rem 1rem;
+  padding: 1rem;
+  border: 2px solid currentColor;
+  border-radius: 1rem;
+}
+
+.ranking-position { font-weight: bold; }
+.ranking-name { overflow-wrap: anywhere; min-width: 0; }
+.ranking-time { grid-column: 2; }

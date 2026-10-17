@@ -14,19 +14,19 @@ def test_pages_use_versioned_main_stylesheet(client):
     response = client.get("/login")
 
     assert response.status_code == 200
-    assert '/static/css/style.css?v=20261017-3' in response.text
+    assert '/static/css/style.css?v=20261017-4' in response.text
 
 
 def test_branding_and_ui_assets_are_served(client):
     login_page = client.get("/login")
-    full_logo = client.get("/static/images/brand/hiromachi-logo.png?v=20261017-3")
-    brand_mark = client.get("/static/images/brand/hiromachi-mark.png?v=20261017-3")
-    icon_sprite = client.get("/static/images/icons/ui.svg?v=20261017-3")
-    stylesheet = client.get("/static/css/style.css?v=20261017-3")
+    full_logo = client.get("/static/images/brand/hiromachi-logo.png?v=20261017-4")
+    brand_mark = client.get("/static/images/brand/hiromachi-mark.png?v=20261017-4")
+    icon_sprite = client.get("/static/images/icons/ui.svg?v=20261017-4")
+    stylesheet = client.get("/static/css/style.css?v=20261017-4")
 
     assert login_page.status_code == 200
-    assert "/static/images/brand/hiromachi-logo.png?v=20261017-3" in login_page.text
-    assert "/static/images/brand/hiromachi-mark.png?v=20261017-3" in login_page.text
+    assert "/static/images/brand/hiromachi-logo.png?v=20261017-4" in login_page.text
+    assert "/static/images/brand/hiromachi-mark.png?v=20261017-4" in login_page.text
     assert full_logo.status_code == 200
     assert full_logo.mimetype == "image/png"
     assert brand_mark.status_code == 200
